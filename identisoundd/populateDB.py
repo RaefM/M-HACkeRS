@@ -13,11 +13,10 @@ cursor.execute('TRUNCATE ONLY movies, songs, songs_to_movies;')
 cursor.execute('ALTER SEQUENCE movies_id_seq RESTART;')
 cursor.execute('ALTER SEQUENCE songs_id_seq RESTART;')
 
-with open("../movieData.txt", "r") as file:
+with open("../MovieData/movieData.txt", "r", errors='ignore') as file:
     contents = file.readlines()
 
-for x in range(65, 68):
-    print(contents[x])
+for x in range(1, len(contents)):
     movieInfo = contents[x].split(';')
     title = movieInfo[0]
     title = title.rstrip()
@@ -27,8 +26,7 @@ for x in range(65, 68):
     cursor.execute("INSERT INTO movies (name) VALUES(%s) RETURNING id;", (title,))
     movieID = cursor.fetchall()[0][0]
     for song in songs:
-        songName, artist = song.split("$") #Ty Dolla $ign messes this up 
-        print(songName) 
+        songName, artist = song.split("=")
         songName = songName.rstrip()
         if len(songName) == 0:
             continue
@@ -53,3 +51,6 @@ print(rows)
 cursor.execute('SELECT * FROM songs_to_movies;')
 rows = cursor.fetchall()
 print(rows)
+
+conn.commit()
+conn.close()
