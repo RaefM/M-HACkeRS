@@ -1,22 +1,73 @@
 package edu.umich.chencxy.identisound
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import java.security.KeyStore.TrustedCertificateEntry
+
 class UIState {
 
-    private var recVisible = true
+//    private var recVisible = true
     var recEnabled by mutableStateOf(true)
-    var recColor by mutableStateOf(Color.Black)
-    var recIcon by mutableStateOf(R.drawable.ic_baseline_play_circle_24_24) // initial value
+    var recIcon by mutableStateOf(R.drawable.ic_baseline_play_circle_24) // initial value
+    var stopIcon by mutableStateOf(R.drawable.ic_baseline_stop_circle_24) // initial value
 
-    var stopEnabled by mutableStateOf(true)
-    var stopColor by mutableStateOf(Color.DarkGray)
-    var stopIcon by mutableStateOf(R.drawable.ic_stop_circle_24) // initial value
+    private fun reset(){
+        recEnabled = false
+        recIcon = R.drawable.ic_baseline_play_circle_24
+    }
 
-//    private fun reset() {
-//
-//        stopEnabled = false
-//        stopColor = Color.Black
-//        stopIcon = R.drawable.ic_baseline_play_circle_24 // initial value
-//    }
+    fun propagate(playerState: PlayerState) = when (playerState){
+        is PlayerState.start -> {
+            when (playerState.mode) {
+                StartMode.standby -> {
+                    recEnabled
+//                    playEnabled(true)
+//                    playCtlEnabled(false)
+//                    doneEnabled(true)
+                }
+                StartMode.record -> {
+                    // initial values already set up for record start mode.
+                    reset()
+                }
+//                StartMode.play -> {
+//                    recIcon = R.drawable.ic_baseline_play_circle_24
+//                    recEnabled = true
+//                }
+            }
+        }
+        PlayerState.recording -> {
+            recIcon = R.drawable.ic_baseline_stop_circle_24
+            recEnabled = true
+        }
+    }
+}
 
+@Composable
+fun recButton(){
+    val audioPlayer = LocalAudioPlayer.current
 
+    Button(onClick = { audioPlayer.recTapped() },
+        enabled = audioPlayer.playerUIState.recEnabled,
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
+            disabledBackgroundColor = Color.White),
+        elevation = ButtonDefaults.elevation(0.dp)
+    ) {
+        Icon(painter = painterResource(audioPlayer.playerUIState.recIcon),
+            modifier= Modifier.size(100.dp),
+            contentDescription = stringResource(R.string.recButton),
+//            tint = audioPlayer.playerUIState.recColor
+        )
+    }
 }

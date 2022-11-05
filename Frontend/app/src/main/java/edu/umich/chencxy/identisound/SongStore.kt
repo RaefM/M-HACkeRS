@@ -13,21 +13,22 @@ import org.json.JSONObject
 import kotlin.reflect.full.declaredMemberProperties
 
 object SongStore {
-    private val _chatts = mutableStateListOf<Song>()
-    val chatts: List<Song> = _chatts
+    private val _songs = mutableStateListOf<Song>()
+    val songs: List<Song> = _songs
     private val nFields = Song::class.declaredMemberProperties.size
 
     private lateinit var queue: RequestQueue
     private const val serverUrl = "https://54.226.221.81/"
     fun postSong(context: Context, song: Song) {
         val jsonObj = mapOf(
-            "uri" to Song.audio
+            "name" to song.Songname,
+            "uri" to song.audio,
         )
         val postRequest = JsonObjectRequest(Request.Method.POST,
             serverUrl+"postaudio/", JSONObject(jsonObj),
             {
                 Log.d("postSong", "Song posted!")
-                getSong(context)
+                getSongTitle(context)
             },
             { error -> Log.e("postSong", error.localizedMessage ?: "JsonObjectRequest error") }
         )

@@ -3,53 +3,44 @@ package edu.umich.chencxy.identisound
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.util.Base64
+import android.os.Handler
 import android.util.Log
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.setValue
 import java.io.*
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.properties.Delegates
 
 
 enum class StartMode {
-    standby, record, play
+    standby, record,
 }
 sealed class PlayerState {
     class start(val mode: StartMode): PlayerState()
     object recording: PlayerState()
-    class playing(val parent: StartMode): PlayerState()
-    class paused(val grand: StartMode): PlayerState()
+//    class playing(val parent: StartMode): PlayerState()
+//    class paused(val grand: StartMode): PlayerState()
 
     fun transition(event: TransEvent): PlayerState {
-        if (event == TransEvent.doneTapped) {
-            return start(StartMode.standby)
-        }
+//        if (event == TransEvent.doneTapped) {
+//            return start(StartMode.standby)
+//        }
         return when (this) {
             is start -> when (mode) {
                 StartMode.record -> if (event == TransEvent.recTapped) recording else this
-                StartMode.play -> if (event == TransEvent.playTapped) playing(StartMode.play) else this
+//                StartMode.play -> if (event == TransEvent.playTapped) playing(StartMode.play) else this
                 StartMode.standby -> when (event) {
                     TransEvent.recTapped -> recording
-                    TransEvent.playTapped -> playing(StartMode.standby)
+//                    TransEvent.playTapped -> playing(StartMode.standby)
                     else -> this
                 }
             }
             recording -> when (event) {
-                TransEvent.recTapped, TransEvent.stopTapped -> start(StartMode.standby)
+//                TransEvent.recTapped -> start(StartMode.standby)
                 TransEvent.failed -> start(StartMode.record)
-                else -> this
-            }
-            is playing -> when (event) {
-                TransEvent.playTapped -> paused(this.parent)
-                TransEvent.stopTapped, TransEvent.failed -> start(this.parent)
-                else -> this
-            }
-            is paused -> when (event) {
-                TransEvent.recTapped -> recording
-                TransEvent.playTapped -> playing(this.grand)
-                TransEvent.stopTapped -> start(StartMode.standby)
                 else -> this
             }
         }
@@ -58,9 +49,10 @@ sealed class PlayerState {
 
 
 enum class TransEvent {
-    recTapped, playTapped, stopTapped, doneTapped, failed
+    recTapped, failed
 }
 
+val LocalAudioPlayer = compositionLocalOf { AudioPlayer() }
 class AudioPlayer() {
     var audio: ByteArray? by mutableStateOf(null)
     lateinit private var audioFilePath: String
@@ -74,21 +66,49 @@ class AudioPlayer() {
 
     var playerUIState = UIState()
     var playerState: PlayerState by Delegates.observable(PlayerState.start(StartMode.standby)) { _, _, playerState ->
-        UIState.propagate(playerState)
+        playerUIState.propagate(playerState)
 
 
-        // change ifstatement to timer 10sec
+        // change if statement to timer 10sec
         // set up the button and link to UIstate
         // check with uploading
 
-        fun recTapped() {
-            if (playerState == PlayerState.recording) {
-                finishRecording()
-            } else {
-                startRecording()
+    }
+
+    fun recTapped() {
+        if (playerState == PlayerState.recording) {
+            finishRecording()
+        } else {
+            startRecording()
+            Timer("stoprecording", false).schedule(10000){
+                if(playerState == PlayerState.recording) {
+                    recTapped()
+                }
             }
         }
     }
+
+    private fun startRecording() {
+        // reset player because we'll be re-using the output file that may have been primed at the player.
+        mediaPlayer.reset()
+
+        playerState = playerState.transition(TransEvent.recTapped)
+
+        with (mediaRecorder) {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setOutputFile(audioFilePath)
+            try {
+                prepare()
+            } catch (e: IOException) {
+                Log.e("startRecording: ", e.localizedMessage ?: "IOException")
+                return
+            }
+            this.start()
+        }
+    }
+
 
     private fun finishRecording() {
         mediaRecorder.stop()
@@ -110,7 +130,6 @@ class AudioPlayer() {
             return
         }
         playerState = playerState.transition(TransEvent.recTapped)
-        preparePlayer()
     }
 
     fun doneTapped() {
@@ -120,8 +139,8 @@ class AudioPlayer() {
             mediaRecorder.reset()
         }
         mediaPlayer.start() // so that playback works on revisit
-        TransEvent.stopTapped()
-        playerState = playerState.transition(TransEvent.doneTapped)
+//        TransEvent.stopTapped()
+//        playerState = playerState.transition(TransEvent.doneTapped)
     }
 }
 
