@@ -88,7 +88,7 @@ class AudioPlayer() {
         }
     }
 
-    private fun startRecording() {
+     fun startRecording() {
         // reset player because we'll be re-using the output file that may have been primed at the player.
         mediaPlayer.reset()
 
