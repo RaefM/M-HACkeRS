@@ -1,6 +1,6 @@
 import json
 import psycopg2
-
+import string
 conn = psycopg2.connect(database="identisounddb",
                         host="localhost",
                         user="chatter",
@@ -16,10 +16,15 @@ cursor.execute('ALTER SEQUENCE songs_id_seq RESTART;')
 with open("../MovieData/movieData.txt", "r", errors='ignore') as file:
     contents = file.readlines()
 
+def cleanse_data(text):
+    """Cleanse data by removing puncation and lowercase."""
+    return text.translate(str.maketrans('','',string.punctuation)).lower()
+
 for x in range(1, len(contents)):
     movieInfo = contents[x].split(';')
     title = movieInfo[0]
     title = title.rstrip()
+    title = cleanse_data(title)
     songInfo = movieInfo[2]
     songs = songInfo.split("%")
     songs = songs[:-1]
