@@ -24,7 +24,6 @@ for x in range(1, len(contents)):
     movieInfo = contents[x].split(';')
     title = movieInfo[0]
     title = title.rstrip()
-    title = cleanse_data(title)
     songInfo = movieInfo[2]
     songs = songInfo.split("%")
     songs = songs[:-1]
@@ -35,6 +34,7 @@ for x in range(1, len(contents)):
         songName = songName.rstrip()
         if len(songName) == 0:
             continue
+        songName = cleanse_data(songName)
         artist = artist.rstrip()
         cursor.execute("SELECT id FROM songs WHERE name=%s;", (songName,))
         foundSong = cursor.fetchall()
