@@ -4,6 +4,10 @@ from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+def cleanse_data(text):
+    """Cleanse data by removing puncation and lowercase."""
+    return text.translate(str.maketrans('','',string.punctuation)).lower()
+
 def getmovies(request):
     if request.method != 'GET':
         return HttpResponse(status=404)
@@ -23,6 +27,8 @@ def getsongs(request):
 
     json_data = json.loads(request.body)
     songName = json_data['songName']
+
+    songName = cleanse_data(songName)
     
     cursor = connection.cursor()
 
