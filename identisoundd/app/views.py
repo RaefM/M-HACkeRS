@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 import json
+import string
 
 def cleanse_data(text):
     """Cleanse data by removing puncation and lowercase."""
