@@ -49,9 +49,9 @@ class MainActivity : ComponentActivity() {
                         composable("MainView") {
                             MainView(this@MainActivity, navController)
                         }
-//                        composable("PostView") {
-//                            PostView(this@MainActivity, navController)
-//                        }
+                        composable("MovieView") {
+                            MovieView(this@MainActivity, navController)
+                        }
                         // passing an optional, nullable argument
                         composable(
                             "AudioView?autoPlay={autoPlay}",
@@ -71,17 +71,7 @@ class MainActivity : ComponentActivity() {
             finish()
         }
     }
-//        setContent {
-//            val navController = rememberNavController()
-//            NavHost(navController, startDestination = "MainView") {
-//                composable("MainView") {
-//                    MainView(this@MainActivity, navController)
-//                }
-//                composable("PostView") {
-//                    PostView(this@MainActivity, navController)
-//                }
-//            }
-//        }
+
 }
 
 class MainViewModel(app: Application): AndroidViewModel(app) {

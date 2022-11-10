@@ -2,10 +2,11 @@
     <string name="chatter">Chatter</string>
     <string name="share">Share</string>
     <string name="send">Send</string>
-    <string name="songname">Songname.</string>
+    <string name="songname">Songname</string>
     <string name="app_name">IdentiSound</string>
     <string name="songaudio"></string>
     <string name="recButton">rec</string>
     <string name="audio">Audio</string>
     <string name="isrecording">false</string>
+    <string name="movie">Movie</string>
 </resources>

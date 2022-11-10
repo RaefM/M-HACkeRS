@@ -3,18 +3,17 @@ package edu.umich.chencxy.identisound
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.os.Handler
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.setValue
-import edu.umich.chencxy.identisound.R.string.isrecording
+import edu.umich.chencxy.identisound.SongStore.getMovie
+import edu.umich.chencxy.identisound.SongStore.postSong
 import java.io.*
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.properties.Delegates
-import androidx.compose.ui.res.stringResource as stringResource
 
 
 var recording = false
@@ -83,6 +82,9 @@ class AudioPlayer() {
         if (recording == true) {
             Log.d("Tag", "finishRecording is called")
             finishRecording()
+            postSong()
+            getMovie()
+
             recording = false
         } else {
             Log.d("Tag", "startRecording is called")
@@ -92,6 +94,9 @@ class AudioPlayer() {
                 if (playerState == PlayerState.recording) {
                     recTapped()
 //                    finishRecording()
+                    // 1. get the songname
+                    // 2. get the moviename
+                    // 3. display the info
 
                 }
             }
