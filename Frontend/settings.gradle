@@ -3,6 +3,9 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+//        flatDir {
+//            dirs 'libs'
+//        }
     }
 }
 dependencyResolutionManagement {
@@ -14,3 +17,12 @@ dependencyResolutionManagement {
 }
 rootProject.name = "IdentiSound"
 include ':app'
+include ':Shazam'
+//
+//allprojects {
+//    repositories {
+//        flatDir {
+//            dirs 'libs'
+//        }
+//    }
+//}

@@ -1,3 +1,11 @@
+//allprojects {
+//    repositories {
+//        flatDir {
+//            dirs 'libs'
+//        }
+//    }
+//}
+
 buildscript {
     ext {
         compose_ui_version = '1.2.1'
