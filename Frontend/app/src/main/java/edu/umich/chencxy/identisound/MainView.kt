@@ -61,7 +61,7 @@ fun RecButton() {
     val audioPlayer = LocalAudioPlayer.current
     val playerUIState = LocalPlayerUIState.current
 
-    Button(onClick = { audioPlayer.startRecording() },
+    Button(onClick = { audioPlayer.recTapped() },
         enabled = playerUIState.recEnabled,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
             disabledBackgroundColor = Color.White),

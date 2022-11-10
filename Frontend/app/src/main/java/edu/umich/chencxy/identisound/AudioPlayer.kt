@@ -9,11 +9,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.setValue
+import edu.umich.chencxy.identisound.R.string.isrecording
 import java.io.*
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.properties.Delegates
+import androidx.compose.ui.res.stringResource as stringResource
 
+
+var recording = false
 
 enum class StartMode {
     standby, record,
@@ -75,18 +79,40 @@ class AudioPlayer() {
 
     }
 
-    fun recTapped() {
-        if (playerState == PlayerState.recording) {
+    fun recTapped() { // attempting
+        if (recording == true) {
+            Log.d("Tag", "finishRecording is called")
             finishRecording()
+            recording = false
         } else {
+            Log.d("Tag", "startRecording is called")
             startRecording()
-            Timer("stoprecording", false).schedule(10000){
-                if(playerState == PlayerState.recording) {
+            recording = true
+            Timer("stoprecording", false).schedule(10000) {
+                if (playerState == PlayerState.recording) {
                     recTapped()
+//                    finishRecording()
+
                 }
             }
         }
     }
+
+//    fun recTapped() {
+//        if (playerState == PlayerState.recording) {
+//            Log.d("Tag","finishRecording is called")
+//            finishRecording()
+//        } else {
+//            Log.d("Tag","startRecording is called")
+//            startRecording()
+//            Timer("stoprecording", false).schedule(10000){
+//                if(playerState == PlayerState.recording) {
+////                    recTapped()
+////                    finishRecording()
+//                }
+//            }
+//        }
+//    }
 
      fun startRecording() {
         // reset player because we'll be re-using the output file that may have been primed at the player.
