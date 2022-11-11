@@ -1,11 +1,14 @@
 package edu.umich.chencxy.identisound
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.*
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley.newRequestQueue
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
 import com.shazam.shazamkit.AudioSampleRateInHz
 import com.shazam.shazamkit.ShazamKit
 import com.shazam.shazamkit.ShazamKitResult
@@ -28,14 +31,13 @@ object SongStore {
     var movie_name = "Drive my car"
 //    fun postSong(context: Context, song: Song) {
 //        val jsonObj = mapOf(
-//            "name" to song.Songname,
-//            "uri" to song.audio,
+//            "songName" to song.Songname,
 //        )
 //        val postRequest = JsonObjectRequest(Request.Method.POST,
-//            serverUrl+"postaudio/", JSONObject(jsonObj),
+//            serverUrl+"getsongs/", JSONObject(jsonObj),
 //            {
 //                Log.d("postSong", "Song posted!")
-//                getSongTitle(context)
+////                getSongTitle(song)
 //            },
 //            { error -> Log.e("postSong", error.localizedMessage ?: "JsonObjectRequest error") }
 //        )
@@ -46,34 +48,42 @@ object SongStore {
 //        queue.add(postRequest)
 //    }
 
-    fun postSong(song: Song) {
-
-        val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
-
-        signatureGenerator.append(song.audio.toByteArray(), song.audio.toByteArray().size, System.currentTimeMillis())
-        val signature = signatureGenerator.generateSignature()
-
-        val catalog = ShazamKit.createShazamCatalog(developerTokenProvider, selectedLocale.value)
-        val session = (ShazamKit.createSession(catalog) as ShazamKitResult.Success).data
-        val matchResult = session.match(signature)
-
+    fun getSongTitle(song: Song) {
+//
+//        val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
+//
+//        signatureGenerator.append(song.audio.toByteArray(), song.audio.toByteArray().size, System.currentTimeMillis())
+//        val signature = signatureGenerator.generateSignature()
+//
+//        val catalog = ShazamKit.createShazamCatalog(developerTokenProvider, selectedLocale.value)
+//        val session = (ShazamKit.createSession(catalog) as ShazamKitResult.Success).data
+//        val matchResult = session.match(signature)
+        val returnedsong = "the story of a soldier"
     }
 
-    fun getMovie(context: Context){
-        val getRequest = JsonObjectRequest(serverUrl+"/songinfo?song_name="+R.string.songname,
-            { response ->
-                val chattsReceived = try { response.getJSONArray("Song_Name") } catch (e: JSONException) { JSONArray() }
-                val MovieReceived = try { response.getJSONArray("MovieData") } catch (e: JSONException) { JSONArray() }
+    fun getMovie(context: Context, song: Song){
+        val jsonObj = mapOf(
+            "songName" to song.Songname,
+        )
+        val postRequest = JsonObjectRequest(Request.Method.POST,
+            serverUrl+"getsongs/", JSONObject(jsonObj),
+            {
+                response ->
+                val MovieReceived = try {response.getJSONArray("movies") } catch (e: JSONException) { JSONArray() }
 
-                _songs.add(Song(Songname = chattsReceived.toString()))
-                _movies.add(Movie(MovieReceived[0].toString(),MovieReceived[1].toString(),MovieReceived[2].toString().toInt(),MovieReceived[3].toString()))
-            }, {}
+                for (i in 0 until MovieReceived.length()) {
+                    val movie = MovieReceived.getJSONObject(i)
+                    _movies.add(Movie(movie.getString("name")))
+                }
+                _songs.add(song)
+            },
+            { error -> Log.e("postSong", error.localizedMessage ?: "JsonObjectRequest error") }
         )
 
         if (!this::queue.isInitialized) {
             queue = newRequestQueue(context)
         }
-        queue.add(getRequest)
+        queue.add(postRequest)
     }
 
 //    fun getSongTitle(context: Context) {

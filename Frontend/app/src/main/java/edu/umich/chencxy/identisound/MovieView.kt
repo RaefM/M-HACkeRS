@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import edu.umich.chencxy.identisound.SongStore.postSong
 
 @Composable
 fun MovieView(context: Context, navController: NavHostController) {

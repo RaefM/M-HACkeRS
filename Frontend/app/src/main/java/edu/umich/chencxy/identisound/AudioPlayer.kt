@@ -9,12 +9,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.setValue
 import edu.umich.chencxy.identisound.SongStore.getMovie
-import edu.umich.chencxy.identisound.SongStore.postSong
+import edu.umich.chencxy.identisound.SongStore.getSongTitle
 import java.io.*
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.properties.Delegates
 
+// context
+// shazam
+//
 
 var recording = false
 
@@ -82,8 +85,7 @@ class AudioPlayer() {
         if (recording == true) {
             Log.d("Tag", "finishRecording is called")
             finishRecording()
-            postSong()
-            getMovie()
+
 
             recording = false
         } else {
@@ -155,12 +157,15 @@ class AudioPlayer() {
             audio = bos.toByteArray()
             bos.close()
             fis.close()
+
+            getMovie(this.getContext(), getSongTitle(audio))
         } catch (e: IOException) {
             Log.e("finishRecording: ", e.localizedMessage ?: "IOException")
             playerState = playerState.transition(TransEvent.failed)
             return
         }
         playerState = playerState.transition(TransEvent.recTapped)
+
     }
 
     fun doneTapped() {
