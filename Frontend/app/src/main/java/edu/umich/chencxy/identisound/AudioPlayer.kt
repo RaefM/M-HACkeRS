@@ -10,14 +10,11 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.setValue
 import edu.umich.chencxy.identisound.SongStore.getMovie
 import edu.umich.chencxy.identisound.SongStore.getSongTitle
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.*
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.properties.Delegates
-
-// context
-// shazam
-//
 
 var recording = false
 
@@ -81,26 +78,24 @@ class AudioPlayer() {
 
     }
 
-    fun recTapped() { // attempting
-        if (recording == true) {
+    suspend fun recTapped(context: Context) { // attempting
+        if (recording) {
             Log.d("Tag", "finishRecording is called")
-            finishRecording()
-
+            finishRecording(context)
 
             recording = false
         } else {
             Log.d("Tag", "startRecording is called")
             startRecording()
             recording = true
-            Timer("stoprecording", false).schedule(10000) {
-                if (playerState == PlayerState.recording) {
-                    recTapped()
-//                    finishRecording()
-                    // 1. get the songname
-                    // 2. get the moviename
-                    // 3. display the info
+//            Timer("stoprecording", false).schedule(10000) {
+//            }
 
-                }
+            withTimeoutOrNull(10000) {
+                Log.d("Tag", "finishRecording is called")
+                recording = false
+
+                finishRecording(context)
             }
         }
     }
@@ -121,7 +116,7 @@ class AudioPlayer() {
 //        }
 //    }
 
-     fun startRecording() {
+     private fun startRecording() {
         // reset player because we'll be re-using the output file that may have been primed at the player.
         mediaPlayer.reset()
 
@@ -143,7 +138,7 @@ class AudioPlayer() {
     }
 
 
-    private fun finishRecording() {
+    private suspend fun finishRecording(context: Context) {
         mediaRecorder.stop()
         mediaRecorder.reset()
         try {
@@ -158,7 +153,15 @@ class AudioPlayer() {
             bos.close()
             fis.close()
 
-            getMovie(this.getContext(), getSongTitle(audio))
+            val songName = getSongTitle(context, audio)
+
+            if (songName == null) {
+                // if failed to identify, restart recording
+                recTapped(context)
+            } else {
+                getMovie(context, Song(songName))
+            }
+
         } catch (e: IOException) {
             Log.e("finishRecording: ", e.localizedMessage ?: "IOException")
             playerState = playerState.transition(TransEvent.failed)
@@ -168,9 +171,9 @@ class AudioPlayer() {
 
     }
 
-    fun doneTapped() {
+    suspend fun doneTapped(context: Context) {
         if (playerState == PlayerState.recording) {
-            finishRecording()
+            finishRecording(context)
         } else {
             mediaRecorder.reset()
         }

@@ -9,4 +9,6 @@
     <string name="audio">Audio</string>
     <string name="isrecording">false</string>
     <string name="movie">Movie</string>
+<!--    TODO: update with actual dev token -->
+    <string name="devToken">INSERT_HERE</string>
 </resources>

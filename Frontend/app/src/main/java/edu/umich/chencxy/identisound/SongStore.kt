@@ -7,14 +7,9 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley.newRequestQueue
-import com.beust.klaxon.JsonObject
-import com.beust.klaxon.Parser
-import com.shazam.shazamkit.AudioSampleRateInHz
-import com.shazam.shazamkit.ShazamKit
-import com.shazam.shazamkit.ShazamKitResult
+import com.shazam.shazamkit.*
 import org.json.JSONArray
 import org.json.JSONException
-//import libs.shazamkit-android-release.aar
 import org.json.JSONObject
 import kotlin.reflect.full.declaredMemberProperties
 
@@ -48,17 +43,29 @@ object SongStore {
 //        queue.add(postRequest)
 //    }
 
-    fun getSongTitle(song: Song) {
-//
-//        val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
-//
-//        signatureGenerator.append(song.audio.toByteArray(), song.audio.toByteArray().size, System.currentTimeMillis())
-//        val signature = signatureGenerator.generateSignature()
-//
-//        val catalog = ShazamKit.createShazamCatalog(developerTokenProvider, selectedLocale.value)
-//        val session = (ShazamKit.createSession(catalog) as ShazamKitResult.Success).data
-//        val matchResult = session.match(signature)
-        val returnedsong = "the story of a soldier"
+    suspend fun getSongTitle(context: Context, audio: ByteArray?): String? {
+        val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
+
+        audio?.let {
+            signatureGenerator.append(
+                it,
+                audio.size,
+                System.currentTimeMillis()
+            )
+        }
+        val signature = signatureGenerator.generateSignature()
+
+        val catalog = ShazamKit.createShazamCatalog(DevTokenProvider(context), null)
+        val session = (ShazamKit.createSession(catalog) as ShazamKitResult.Success).data
+
+        val songName: String? =
+            when (val match = session.match(signature)) {
+                is MatchResult.Match -> match.matchedMediaItems[0].title
+                is MatchResult.NoMatch -> null
+                is MatchResult.Error -> null
+            }
+
+        return songName
     }
 
     fun getMovie(context: Context, song: Song){
