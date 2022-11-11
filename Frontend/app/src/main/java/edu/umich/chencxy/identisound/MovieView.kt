@@ -19,6 +19,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
+/*
+    TO DO:
+    1) Get MovieView working with dummy constants
+    2) Query backend with dummy song name and use results to populate the movie view
+        - the movie list is currently stored in SongStore.kt's _movies
+    3) Get ShazamKit working and integrate the song name it returns instead of the dummy song name
+ */
+
 @Composable
 fun MovieView(context: Context, navController: NavHostController) {
     val songname = stringResource(R.string.songname)
