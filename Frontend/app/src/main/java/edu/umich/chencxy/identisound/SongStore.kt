@@ -45,7 +45,6 @@ object SongStore {
 //    }
 
     suspend fun getSongTitle(context: Context, audio: ByteArray?): String? {
-        /*
         val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
 
         audio?.let {
@@ -67,8 +66,6 @@ object SongStore {
                 is MatchResult.Error -> null
             }
 
-        return songName*/
-        val songName = "If I Didn't Care"
         return songName
     }
 
