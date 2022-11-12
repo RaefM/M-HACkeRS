@@ -52,17 +52,17 @@ fun MainView(context: Context, navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier=Modifier.fillMaxHeight(1f)) {
         Spacer(modifier = Modifier.fillMaxHeight(.05f))
-        RecButton(context)
+        RecButton(context, navController)
         Log.d("abc","we are here")
     }
 }
 
 @Composable
-fun RecButton(context: Context) {
+fun RecButton(context: Context, navController: NavHostController) {
     val audioPlayer = LocalAudioPlayer.current
     val playerUIState = LocalPlayerUIState.current
 
-    Button(onClick = { runBlocking { audioPlayer.recTapped(context) } },
+    Button(onClick = { runBlocking { audioPlayer.recTapped(context,navController) }},
         enabled = playerUIState.recEnabled,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
             disabledBackgroundColor = Color.White),

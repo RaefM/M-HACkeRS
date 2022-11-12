@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
 import edu.umich.chencxy.identisound.SongStore.getMovie
 import edu.umich.chencxy.identisound.SongStore.getSongTitle
 import kotlinx.coroutines.withTimeoutOrNull
@@ -78,10 +79,10 @@ class AudioPlayer() {
 
     }
 
-    suspend fun recTapped(context: Context) { // attempting
+    suspend fun recTapped(context: Context, navController: NavHostController) { // attempting
         if (recording) {
             Log.d("Tag", "finishRecording is called")
-            finishRecording(context)
+            finishRecording(context,navController)
 
             recording = false
         } else {
@@ -93,9 +94,9 @@ class AudioPlayer() {
 
             withTimeoutOrNull(10000) {
                 Log.d("Tag", "finishRecording is called")
-                recording = false
-
-                finishRecording(context)
+                //if(recording){
+                //recording = false
+                //finishRecording(context)}
             }
         }
     }
@@ -138,7 +139,8 @@ class AudioPlayer() {
     }
 
 
-    private suspend fun finishRecording(context: Context) {
+    private suspend fun finishRecording(context: Context, navController: NavHostController) {
+        Log.d("pika-pika","called finish recording")
         mediaRecorder.stop()
         mediaRecorder.reset()
         try {
@@ -157,9 +159,10 @@ class AudioPlayer() {
 
             if (songName == null) {
                 // if failed to identify, restart recording
-                recTapped(context)
+                recTapped(context,navController)
             } else {
-                getMovie(context, Song(songName))
+                getMovie(context, Song(songName), navController)
+
             }
 
         } catch (e: IOException) {
@@ -171,16 +174,17 @@ class AudioPlayer() {
 
     }
 
-    suspend fun doneTapped(context: Context) {
-        if (playerState == PlayerState.recording) {
-            finishRecording(context)
-        } else {
-            mediaRecorder.reset()
-        }
-        mediaPlayer.start() // so that playback works on revisit
+
+//    suspend fun doneTapped(context: Context) {
+//        if (playerState == PlayerState.recording) {
+//            finishRecording(context)
+//        } else {
+//            mediaRecorder.reset()
+//        }
+//        mediaPlayer.start() // so that playback works on revisit
 //        TransEvent.stopTapped()
 //        playerState = playerState.transition(TransEvent.doneTapped)
     }
-}
+//}
 
 

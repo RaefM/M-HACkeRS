@@ -3,6 +3,7 @@ package edu.umich.chencxy.identisound
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.*
+import androidx.navigation.NavHostController
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
@@ -44,6 +45,7 @@ object SongStore {
 //    }
 
     suspend fun getSongTitle(context: Context, audio: ByteArray?): String? {
+        /*
         val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
 
         audio?.let {
@@ -65,10 +67,13 @@ object SongStore {
                 is MatchResult.Error -> null
             }
 
+        return songName*/
+        val songName = "If I Didn't Care"
         return songName
     }
 
-    fun getMovie(context: Context, song: Song){
+    fun getMovie(context: Context, song: Song, navController: NavHostController){
+        Log.d("pikapika","getMovie")
         val jsonObj = mapOf(
             "songName" to song.Songname,
         )
@@ -76,13 +81,19 @@ object SongStore {
             serverUrl+"getsongs/", JSONObject(jsonObj),
             {
                 response ->
-                val MovieReceived = try {response.getJSONArray("movies") } catch (e: JSONException) { JSONArray() }
-
+                val MovieReceived = try {response.getJSONArray("movies")
+                } catch (e: JSONException) { JSONArray() }
                 for (i in 0 until MovieReceived.length()) {
-                    val movie = MovieReceived.getJSONObject(i)
-                    _movies.add(Movie(movie.getString("name")))
+                    Log.d("pikapika","Inside Line 86")
+                    val movie = MovieReceived[i] as JSONArray
+                    _movies.add(Movie(movie[0].toString())) //get the name of the movie
+
+
+                //    val movie = MovieReceived.getJSONObject(i)
+                //    _movies.add(Movie(movie.getString("name")))
                 }
                 _songs.add(song)
+                navController.navigate("MovieView")
             },
             { error -> Log.e("postSong", error.localizedMessage ?: "JsonObjectRequest error") }
         )

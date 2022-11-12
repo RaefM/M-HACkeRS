@@ -1,9 +1,11 @@
 package edu.umich.chencxy.identisound
 
+import android.content.Context
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -14,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.runBlocking
 import java.security.KeyStore.TrustedCertificateEntry
 
 class UIState {
@@ -54,20 +57,20 @@ class UIState {
     }
 }
 
-@Composable
-fun recButton(){
-    val audioPlayer = LocalAudioPlayer.current
-
-    Button(onClick = { audioPlayer.recTapped() },
-        enabled = audioPlayer.playerUIState.recEnabled,
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
-            disabledBackgroundColor = Color.White),
-        elevation = ButtonDefaults.elevation(0.dp)
-    ) {
-        Icon(painter = painterResource(audioPlayer.playerUIState.recIcon),
-            modifier= Modifier.size(100.dp),
-            contentDescription = stringResource(R.string.recButton),
-//            tint = audioPlayer.playerUIState.recColor
-        )
-    }
-}
+//@Composable
+//fun recButton(context: Context){
+//    val audioPlayer = LocalAudioPlayer.current
+//    //runBlocking { audioPlayer.recTapped(context) }
+//    Button(onClick = { runBlocking{audioPlayer.recTapped(context)} },
+//        enabled = audioPlayer.playerUIState.recEnabled,
+//        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
+//            disabledBackgroundColor = Color.White),
+//        elevation = ButtonDefaults.elevation(0.dp)
+//    ) {
+//        Icon(painter = painterResource(audioPlayer.playerUIState.recIcon),
+//            modifier= Modifier.size(100.dp),
+//            contentDescription = stringResource(R.string.recButton),
+////            tint = audioPlayer.playerUIState.recColor
+//        )
+//    }
+//}
