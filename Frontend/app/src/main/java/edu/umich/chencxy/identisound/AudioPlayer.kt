@@ -92,12 +92,12 @@ class AudioPlayer() {
 //            Timer("stoprecording", false).schedule(10000) {
 //            }
 
-            withTimeoutOrNull(10000) {
-                Log.d("Tag", "finishRecording is called")
-                //if(recording){
-                //recording = false
-                //finishRecording(context)}
-            }
+//            withTimeoutOrNull(10000) {
+//                Log.d("Tag", "finishRecording is called")
+//                //if(recording){
+//                //recording = false
+//                //finishRecording(context)}
+//            }
         }
     }
 
@@ -159,7 +159,9 @@ class AudioPlayer() {
 
             if (songName == null) {
                 // if failed to identify, restart recording
-                recTapped(context,navController)
+                Log.d("finishRecording", "song was null")
+                getMovie(context, Song("If I Didn't Care"), navController)
+                //recTapped(context,navController)
             } else {
                 getMovie(context, Song(songName), navController)
 

@@ -1,6 +1,7 @@
 package edu.umich.chencxy.identisound
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
@@ -61,9 +62,18 @@ object SongStore {
 
         val songName: String? =
             when (val match = session.match(signature)) {
-                is MatchResult.Match -> match.matchedMediaItems[0].title
-                is MatchResult.NoMatch -> null
-                is MatchResult.Error -> null
+                is MatchResult.Match -> {
+                    Log.d("shazam success", match.matchedMediaItems.toString())
+                    match.matchedMediaItems[0].title
+                }
+                is MatchResult.Error -> {
+                    Log.d("shazam error", match.exception.toString())
+                    null
+                }
+                is MatchResult.NoMatch -> {
+                    Log.d("shazam none", match.querySignature.toString())
+                    null
+                }
             }
 
         return songName
