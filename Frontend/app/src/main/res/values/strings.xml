@@ -9,4 +9,5 @@
     <string name="audio">Audio</string>
     <string name="isrecording">false</string>
     <string name="movie">Movie</string>
+    <string name="devToken">eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjJaOUg5Q1oyNUgifQ.eyJpc3MiOiJOVDYyNFVRTDNLIiwiZXhwIjoxNjg0MDUzMDA2LCJpYXQiOjE2NjgyNzYwMDZ9.M50KWpwi3XqeKGcbgnImm974k0PoVFoXYFw30mYxjzD2eAhy8Wv1xtsAGWmOaDSeSDfcgPDhvtoYlpnmHnfm0A</string>
 </resources>

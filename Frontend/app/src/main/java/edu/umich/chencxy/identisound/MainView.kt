@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.runBlocking
 
 val LocalPlayerUIState = compositionLocalOf { UIState() }
 
@@ -44,24 +45,24 @@ fun MainView(context: Context, navController: NavHostController) {
     LaunchedEffect(Unit) {
         if (isLaunching) {
             isLaunching = false
-            getSongTitle(context)
+            //getSongTitle(context)
         }
     }
     Column(verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier=Modifier.fillMaxHeight(1f)) {
         Spacer(modifier = Modifier.fillMaxHeight(.05f))
-        RecButton()
+        RecButton(context, navController)
         Log.d("abc","we are here")
     }
 }
 
 @Composable
-fun RecButton() {
+fun RecButton(context: Context, navController: NavHostController) {
     val audioPlayer = LocalAudioPlayer.current
     val playerUIState = LocalPlayerUIState.current
 
-    Button(onClick = { audioPlayer.recTapped() },
+    Button(onClick = { runBlocking { audioPlayer.recTapped(context,navController) }},
         enabled = playerUIState.recEnabled,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
             disabledBackgroundColor = Color.White),
