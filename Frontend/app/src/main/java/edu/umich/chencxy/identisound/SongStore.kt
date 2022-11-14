@@ -69,6 +69,9 @@ object SongStore {
                 response ->
                 val MovieReceived = try {response.getJSONArray("movies")
                 } catch (e: JSONException) { JSONArray() }
+
+                _movies.clear()
+
                 for (i in 0 until MovieReceived.length()) {
                     Log.d("pikapika","Inside Line 86")
                     val movie = MovieReceived[i] as JSONArray

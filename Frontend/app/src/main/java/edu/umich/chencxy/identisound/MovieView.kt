@@ -32,9 +32,7 @@ import edu.umich.chencxy.identisound.SongStore.songs
 @Composable
 fun MovieView(context: Context, navController: NavHostController) {
     val songname = songs[songs.size-1].Songname.toString()
-    val songmovie = movies[movies.size-1].Movie_name.toString()
-//    val songmovie by rememberSaveable { mutableStateOf(context.getString(R.string.movie)) }
-//    var enableSend by rememberSaveable { mutableStateOf(true) }
+//    val songmovie = movies[movies.size-1].Movie_name.toString()
 
     Scaffold(
         // put the topBar here
@@ -48,14 +46,13 @@ fun MovieView(context: Context, navController: NavHostController) {
         ) {
             Text(songname, Modifier.padding(0.dp, 30.dp, 0.dp, 0.dp)
                 .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
-            Text(songmovie, Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp)
-                .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
-//            TextField(
-//                value = songmovie,
-//                modifier = Modifier.padding(8.dp, 20.dp, 8.dp, 0.dp).fillMaxWidth(1f),
-//                textStyle = TextStyle(fontSize = 17.sp),
-//                colors = TextFieldDefaults.textFieldColors(backgroundColor=Color(0xffffffff))
-//            )
+            movies.forEach{movie ->
+                val songmovie = movie.Movie_name.toString()
+                Text(songmovie, Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp)
+                    .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
+            }
+//            Text(songmovie, Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp)
+//                .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
         }
     }
 }
