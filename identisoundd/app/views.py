@@ -18,7 +18,7 @@ def getmovies(request):
     rows = cursor.fetchall()
 
     response = {}
-    response['movies'] = rows
+    response['songs'] = rows
     return JsonResponse(response)
 
 @csrf_exempt
@@ -43,7 +43,7 @@ def getsongs(request):
     songId = queryResp[0][0]
     
     cursor.execute(
-            "SELECT m.name, sm.movieid " +
+            "SELECT m.name, m.year, m.director, m.posterurl " +
             "FROM songs_to_movies sm " +
             "JOIN movies m ON sm.movieid = m.id " +
             "WHERE sm.songid = '%s';"
