@@ -2,8 +2,11 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import default_storage
 import json
 import string
+import uuid
+import pathlib
 
 def cleanse_data(text):
     """Cleanse data by removing puncation and lowercase."""
@@ -56,3 +59,15 @@ def getsongs(request):
     movieIDs['movies'] = movieInfo
 
     return JsonResponse(movieIDs)
+
+@csrf_exempt
+def postAudio(request):
+    if request.method != 'POST':
+        return HttpResponse(status=404)
+
+    # Read in the audio file
+    audioDataFile = request.FILES["file"]
+    file_name = default_storage.save(audioDataFile.name, audioDataFile)
+
+    # call the normalizeRequest function with this file_name
+    # pass the resulting vector to our ml model and call predict

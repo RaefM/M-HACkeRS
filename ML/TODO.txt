@@ -1,0 +1,5 @@
+1. Meet with backend team and make sure the views function is correct.
+2. Get a sample audio clip from the app and save it for testing
+3. Convert the sample audio clip into a normalized pitch vector (90% done)
+4. Create machine learning model 
+5. Train machine learning model
