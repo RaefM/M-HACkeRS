@@ -34,8 +34,8 @@ def getOAuth():
     }, json=True)
 
     token_dict = r.json()
-    
-    return token_dict["access_token"]
+    if "access_token" in token_dict:
+      return token_dict["access_token"]
 
 @RateLimiter(max_calls=10, period=1)
 def getTrackID(oathToken, songName):
@@ -94,17 +94,33 @@ def getPitchAnalysis(oathToken, trackID):
         access_token = getOAuth()
         getPitchAnalysis(access_token, trackID)
 
-    return r.json()["segments"]
+    if "segments" in r.json():
+      return r.json()["segments"]
+      
 
 def getSpotifyPitchData(songNames):
     oathToken = getOAuth()
 
-    allSegments = []
+    allSegments = {}
 
+    """
+    {
+      songName: pitchAnalysis
+    }
+    """
+    i = 0
     for songName in songNames:
+        if i % 50 == 0:
+            print("Percentage complete: " + str(100 * i / len(songNames)))
         spotifyTrackID = getTrackID(oathToken, songName)
-        allSegments.append(getPitchAnalysis(oathToken, spotifyTrackID))
+        allSegments[songName] = getPitchAnalysis(oathToken, spotifyTrackID)
+        # allSegments.append(songName, getPitchAnalysis(oathToken, spotifyTrackID))
         # print(getPitchVector)
+
+        if i == 0:
+            print(str(allSegments[songName]))
+
+        i += 1
 
     return allSegments
 
@@ -117,7 +133,21 @@ def grabSongs():
         songList.append(i[1])
     return songList
 
+def writeToJSON(data):
+  json_object = json.dumps(data, indent=4)
+  with open("pitchVectors.json", "w") as outfile:
+    outfile.write(json_object)
 
 if __name__ == "__main__":
     songList = grabSongs()
-    getSpotifyPitchData(songList)
+    dataLists = getSpotifyPitchData(songList)
+    writeToJSON(dataLists)
+
+
+'''
+
+In A SEPARATE NORMALIZATION SCRIPT
+1. Normalize pitch vectors
+2. Output to training file 
+
+'''
