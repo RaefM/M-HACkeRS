@@ -8,6 +8,8 @@ import string
 import uuid
 import pathlib
 
+from django.core.files.storage import FileSystemStorage
+
 def cleanse_data(text):
     """Cleanse data by removing puncation and lowercase."""
     return text.translate(str.maketrans('','',string.punctuation)).lower()
@@ -65,9 +67,17 @@ def postAudio(request):
     if request.method != 'POST':
         return HttpResponse(status=404)
 
-    # Read in the audio file
-    audioDataFile = request.FILES["file"]
-    file_name = default_storage.save(audioDataFile.name, audioDataFile)
+    # loading multipart/form-data
+    fileName = "./static/audiofiles/"+request.POST.get("fileName")
 
-    # call the normalizeRequest function with this file_name
-    # pass the resulting vector to our ml model and call predict
+    if request.FILES.get("file"):
+        content = request.FILES['file']
+        fs = FileSystemStorage()
+        filename = fs.save(fileName, content)
+        fileurl = fs.url(filename)
+    else:
+        fileurl = None
+
+    return JsonResponse({"status":"200", "fileurl":fileurl})
+
+
