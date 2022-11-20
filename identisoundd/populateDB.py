@@ -30,6 +30,7 @@ for x in range(1, len(contents)):
     year = movieInfo[3]
     director = movieInfo[4]
     posterUrl = movieInfo[5]
+    posterUrl = posterUrl.rstrip()
     cursor.execute("INSERT INTO movies (name, year, director, posterurl) VALUES(%s, %s, %s, %s) RETURNING id;", (title,year,director,posterUrl))
     movieID = cursor.fetchall()[0][0]
     for song in songs:
