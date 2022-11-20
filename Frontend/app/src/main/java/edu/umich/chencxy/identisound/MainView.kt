@@ -48,11 +48,12 @@ fun MainView(context: Context, navController: NavHostController) {
             //getSongTitle(context)
         }
     }
+    RecButton(context, navController)
     Column(verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier=Modifier.fillMaxHeight(1f)) {
+        modifier=Modifier.fillMaxHeight(1f).size(width=200.dp,height = 800.dp)) {
         Spacer(modifier = Modifier.fillMaxHeight(.05f))
-        RecButton(context, navController)
+
         Log.d("abc","we are here")
     }
 }

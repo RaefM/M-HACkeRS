@@ -25,6 +25,9 @@ object SongStore {
     private const val serverUrl = "https://54.226.221.81/"
 
     suspend fun getSongTitle(context: Context, audio: ByteArray?): String? {
+
+        val DEBUG = true
+        if (DEBUG){return "If I Didn't Care"}
         val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
 
         audio?.let {
@@ -74,8 +77,12 @@ object SongStore {
 
                 for (i in 0 until MovieReceived.length()) {
                     Log.d("pikapika","Inside Line 86")
+                    // Movie Title
+                    // Movie Year
+                    // Movie Director
+                    // Movie Media Poster Link
                     val movie = MovieReceived[i] as JSONArray
-                    _movies.add(Movie(movie[0].toString())) //get the name of the movie
+                    _movies.add(Movie(movie[0].toString(),movie[1].toString(),movie[2].toString(),movie[3].toString())) //get the name of the movie
                 }
                 _songs.add(song)
                 navController.navigate("MovieView")

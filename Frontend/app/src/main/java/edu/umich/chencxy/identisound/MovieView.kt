@@ -3,6 +3,7 @@ package edu.umich.chencxy.identisound
 import android.content.Context
 import android.util.Base64
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,22 +38,27 @@ fun MovieView(context: Context, navController: NavHostController) {
     Scaffold(
         // put the topBar here
     ) {
-        Column(
+        LazyColumn(
             verticalArrangement = Arrangement.SpaceAround,
             modifier = Modifier.padding(it.calculateStartPadding(LayoutDirection.Ltr)+8.dp,
                 it.calculateTopPadding(),
                 it.calculateEndPadding(LayoutDirection.Ltr)+8.dp,
                 it.calculateBottomPadding())
         ) {
-            Text(songname, Modifier.padding(0.dp, 30.dp, 0.dp, 0.dp)
-                .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
-            movies.forEach{movie ->
-                val songmovie = movie.Movie_name.toString()
-                Text(songmovie, Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp)
-                    .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
+            item{
+                Text(songname, Modifier.padding(0.dp, 30.dp, 0.dp, 0.dp)
+                .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)}
+//            movies.forEach{movie ->
+//                val songmovie = movie.Movie_name.toString()
+//                Text(songmovie, Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp)
+//                    .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
+            items(count = movies.size, key = { index -> movies[index].Movie_name ?: index }) { index ->
+                MovieListRow(index, movies[index])
+
+
             }
-//            Text(songmovie, Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp)
-//                .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)
-        }
+
+
+      }
     }
 }

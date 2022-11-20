@@ -4,9 +4,11 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 class Movie(var Movie_name: String? = null,
-           Director: String? = null,
-            Year: Int? = null,
-            Timestamp: String? = null
+            var Year: String? = null,
+           var Director: String? = null,
+            var Media_link: String? = null,
+
+           Timestamp: String? = null
 ) {
 //    var audio: String? by SongPropDelegate(audio)}
 
