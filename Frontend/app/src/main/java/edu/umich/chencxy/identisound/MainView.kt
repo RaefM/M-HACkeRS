@@ -1,5 +1,6 @@
 package edu.umich.chencxy.identisound
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
@@ -33,11 +34,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.runBlocking
 
 val LocalPlayerUIState = compositionLocalOf { UIState() }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainView(context: Context, navController: NavHostController) {
     var isLaunching by rememberSaveable { mutableStateOf(true) }
@@ -48,13 +51,23 @@ fun MainView(context: Context, navController: NavHostController) {
             //getSongTitle(context)
         }
     }
-    RecButton(context, navController)
-    Column(verticalArrangement = Arrangement.SpaceAround,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier=Modifier.fillMaxHeight(1f).size(width=200.dp,height = 800.dp)) {
-        Spacer(modifier = Modifier.fillMaxHeight(.05f))
+    Scaffold() {
 
-        Log.d("abc","we are here")
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth().fillMaxHeight().background(color = Color(0xAFBBF2)),
+
+        ) {
+            Text(
+                "Press To Crash the phone🥰🥰",
+                fontSize = 22.sp,
+                textAlign = TextAlign.End,
+                modifier = Modifier.padding(4.dp, 8.dp, 4.dp, 0.dp)
+            )
+            RecButton(context, navController)
+            Log.d("abc", "we are here")
+        }
     }
 }
 

@@ -25,9 +25,9 @@ object SongStore {
     private const val serverUrl = "https://54.226.221.81/"
 
     suspend fun getSongTitle(context: Context, audio: ByteArray?): String? {
-
-        val DEBUG = true
-        if (DEBUG){return "If I Didn't Care"}
+        //DEBUG = true turns off Shazam function... For testing front end quickly.
+        //val DEBUG = false
+        //if (DEBUG){return "Singin' in the Rain"} //If I Didn't Care
         val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
 
         audio?.let {

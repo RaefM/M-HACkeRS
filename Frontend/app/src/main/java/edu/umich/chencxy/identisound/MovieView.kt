@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -39,7 +40,7 @@ fun MovieView(context: Context, navController: NavHostController) {
         // put the topBar here
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.SpaceAround,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(it.calculateStartPadding(LayoutDirection.Ltr)+8.dp,
                 it.calculateTopPadding(),
                 it.calculateEndPadding(LayoutDirection.Ltr)+8.dp,
@@ -47,7 +48,7 @@ fun MovieView(context: Context, navController: NavHostController) {
         ) {
             item{
                 Text(songname, Modifier.padding(0.dp, 30.dp, 0.dp, 0.dp)
-                .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 20.sp)}
+                .fillMaxWidth(1f), textAlign=TextAlign.Center, fontSize = 30.sp, fontWeight = FontWeight.Bold)}
 //            movies.forEach{movie ->
 //                val songmovie = movie.Movie_name.toString()
 //                Text(songmovie, Modifier.padding(0.dp, 60.dp, 0.dp, 0.dp)
