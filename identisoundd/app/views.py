@@ -10,6 +10,7 @@ import pathlib
 import base64
 
 from django.core.files.storage import FileSystemStorage
+from io import StringIO
 
 def cleanse_data(text):
     """Cleanse data by removing puncation and lowercase."""
@@ -73,7 +74,8 @@ def postAudio(request):
     fileName = "./static/audiofiles/"+json_data["fileName"]
 
     b64content = json_data['file']
-    content = base64.b64decode(b64content)
+    decodedStringContent = base64.b64decode(b64content)
+    content = StringIO('foo')
 
     fs = FileSystemStorage()
     filename = fs.save(fileName, content)
