@@ -74,8 +74,8 @@ def postAudio(request):
     fileName = "./static/audiofiles/"+json_data["fileName"]
 
     b64content = json_data['file']
-    decodedStringContent = base64.b64decode(b64content)
-    content = StringIO('foo')
+    decodedStringContent = base64.b64decode(b64content).decode('utf-8')
+    content = StringIO(decodedStringContent)
 
     fs = FileSystemStorage()
     filename = fs.save(fileName, content)
