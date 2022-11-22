@@ -7,6 +7,7 @@ import json
 import string
 import uuid
 import pathlib
+import base64
 
 from django.core.files.storage import FileSystemStorage
 
@@ -67,11 +68,12 @@ def postAudio(request):
     if request.method != 'POST':
         return HttpResponse(status=404)
 
-    # loading multipart/form-data
     fileName = "./static/audiofiles/"+request.POST.get("fileName")
 
-    if request.FILES.get("file"):
-        content = request.FILES['file']
+    if request.POST.get("file"):
+        b64content = request.POST.get('file')
+        content = base64.b64decode(b64content)
+
         fs = FileSystemStorage()
         filename = fs.save(fileName, content)
         fileurl = fs.url(filename)
