@@ -68,18 +68,15 @@ def postAudio(request):
     if request.method != 'POST':
         return HttpResponse(status=404)
 
-    fileName = "./static/audiofiles/"+request.POST.get("fileName")
+    json_data = json.loads(request.body)
 
-    if request.POST.get("file"):
-        b64content = request.POST.get('file')
-        content = base64.b64decode(b64content)
+    fileName = "./static/audiofiles/"+json_data["fileName"]
 
-        fs = FileSystemStorage()
-        filename = fs.save(fileName, content)
-        fileurl = fs.url(filename)
-    else:
-        fileurl = None
+    b64content = json_data['file']
+    content = base64.b64decode(b64content)
+
+    fs = FileSystemStorage()
+    filename = fs.save(fileName, content)
+    fileurl = fs.url(filename)
 
     return JsonResponse({"status":"200", "fileurl":fileurl})
-
-
