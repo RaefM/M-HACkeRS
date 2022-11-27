@@ -182,7 +182,7 @@ def get_exp_grid(pows=5):
   return exp_range
 
 # Returns a grid of dimensions (pows*2, pows*2) consisting of all pairs of powers of 10 from 10^-(pows) to 10^(pows)
-def get_exp_grid_square(pows=5):
+def get_exp_grid_square(pows=3):
   exp_range_line = get_exp_grid(pows)
   exp_range_square = []
 
