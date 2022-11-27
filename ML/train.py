@@ -170,7 +170,7 @@ def select_param_poly(X, y, degree=2, k=5, metric="accuracy", param_range=[]):
   return select_param_general(get_svc, X, y, k, metric, param_range, "(C, r)")
 
 # Returns a grid of dimensions (pows*2, ) consisting of powers of 10 from 10^-(pows) to 10^(pows)
-def get_exp_grid(pows=5):
+def get_exp_grid(pows=3):
   exp_range = []
 
   for pow in range(pows):
