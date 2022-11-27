@@ -17,8 +17,8 @@ pip install matplotlib
 pip install -U scikit-learn
 """
 
-def openJSON():
-  f = open("pitchVectors.json")
+def openJSON(fname):
+  f = open(fname)
   return json.load(f)
 
 
