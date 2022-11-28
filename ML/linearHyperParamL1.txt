@@ -1,0 +1,8 @@
+For C = 1 accuracy had performance = 0.2746272815446401
+For C = 0.1 accuracy had performance = 0.11105742600239607
+For C = 0.01 accuracy had performance = 0.009025497237507278
+For C = 1 accuracy had performance = 0.27583351908993925
+For C = 10 accuracy had performance = 0.2967321250580567
+For C = 100 accuracy had performance = 0.29726341380135546
+
+	BEST VALUES FOR L1 LINEAR (C): 100
