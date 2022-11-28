@@ -20,7 +20,9 @@ from sklearn.model_selection import train_test_split
 from skopt.utils import point_asdict
 from sklearn.pipeline import Pipeline
 from sklearn_genetic.callbacks import ProgressBar
-
+from sklearn.kernel_approximation import RBFSampler
+from sklearn.linear_model import SGDClassifier
+from sklearn.kernel_approximation import PolynomialCountSketch
 
 """
 DEPENDENCY SETUP INSTRUCTIONS
@@ -72,9 +74,6 @@ def extract_training_data():
   return np.array(xTrain), np.array(yTrue), np.array(yTrueBinaryMatrix)
 
 
-"""
-Returns a linear SVM clasifier with the specified hyperparameter values
-"""
 def create_linear_classifier(penalty='l2', c=1.0, degree=1, decision_function_shape='ovr'):
   if (penalty == 'l1'):
     return LinearSVC(penalty = 'l1', dual = False, C = c,class_weight = 'balanced')
@@ -82,18 +81,16 @@ def create_linear_classifier(penalty='l2', c=1.0, degree=1, decision_function_sh
     return LinearSVC(dual = False, C = c,class_weight = 'balanced')
 
 
-"""
-Returns a polynomial SVM classifier with the specified hyperparameter values
-"""
-def create_poly_classifier(degree=2, c=1.0, r=0.0, decision_function_shape='ovr'):
-  return OneVsRestClassifier(SVC(kernel='poly', degree = 2, C = c, coef0 = r, class_weight = 'balanced', gamma = 'auto'))
+def create_poly_classifier(X, y, degree=2, c=1.0, r=0.0):
+  ps = PolynomialCountSketch(degree=degree, random_state=1, gamma=c, coef0=r)
+  X_new = ps.fit_transform(X, y)
+  return SGDClassifier(max_iter=1000, tol=1e-3), X_new
 
 
-"""
-May not be relevant. As per scikit learn, use the GridSearchCV method
-"""
-def create_rbf_classifier(c=1.0, gamma=0.0, decision_function_shape='ovr'):
-  return OneVsRestClassifier(SVC(kernel='rbf', C = c, class_weight = 'balanced', gamma = gamma))
+def create_rbf_classifier(X, y, gamma=0.0):
+  rbf_feature = RBFSampler(gamma=gamma, random_state=1)
+  X_new = rbf_feature.fit_transform(X, y)
+  return SGDClassifier(max_iter=1000, tol=1e-3), X_new
 
 def performance(y_true, Y_pred, metric="accuracy"):
     """Calculate performance metrics.
@@ -129,23 +126,6 @@ def performance(y_true, Y_pred, metric="accuracy"):
         tn, fp, fn, tp = metrics.confusion_matrix(y_true, Y_pred, labels= [-1,1]).ravel()
         return tn/(tn + fp)
 
-      
-"""
-Compute performance with the specified metric
-"""
-"""
-def performance(y_true, y_pred, metric="accuracy"):
-  conf_mat = confusion_matrix(y_true, y_pred, labels = [1, -1])
-  arr_conf_mat = np.array(conf_mat)
-  
-  if (metric == "accuracy"):
-    # add along diagonal and divide by total number of predictions
-    # diagonal signifies values that had the same true and predicted value
-    np.sum(arr_conf_mat.diagonal()) / np.sum(arr_conf_mat)
-  else:
-    print("Unsupported performance metric")
-    raise(NotImplementedError)
-"""
 
 """
 Returns: average performance on the stipulated metric across all k folds
@@ -153,9 +133,6 @@ Returns: average performance on the stipulated metric across all k folds
 def cv_performance(clf, X, y, k=4, metric="accuracy"):
   stratifiedKFold = StratifiedKFold(n_splits = k, shuffle=True)
   scores = []
-
-  # take all elts of y2d and concat all 01s to a string, then use that as the label
-  # after entering the loop, convert back to 2d by calling list(str).map(i => stoi(i))
 
   # Train and test on each of the stratifications
   for train_i, test_i in stratifiedKFold.split(X,y):
@@ -224,8 +201,8 @@ def select_param_general(get_svc, X, y, k=4, metric="accuracy", param_range=[], 
   log = []
 
   for param_val in param_range:
-    clf_i = get_svc(param_val)
-    perf_i = cv_performance(clf_i, X, y, k, metric)
+    clf_i, Xnew = get_svc(param_val, X, y)
+    perf_i = cv_performance(clf_i, Xnew, y, k, metric)
 
     update_logs(log, 'For ' + param_names +  ' = ' + str(param_val) + ' ' + metric + ' had performance = ' + str(perf_i) + '\n')
 
@@ -240,8 +217,8 @@ Sweeps the provided range of hyperparameter values and returns the hyperparamete
 Uses a linear kernel SVM
 """
 def select_param_linear(X, y, k=4, penalty='l2', metric="accuracy", param_range=[]):
-  def get_svc(curr_params):
-    return create_linear_classifier(penalty=penalty, c=curr_params)
+  def get_svc(curr_params, X, y):
+    return create_linear_classifier(penalty=penalty, c=curr_params), X
   
   return select_param_general(get_svc, X, y, k, metric, param_range)
 
@@ -282,7 +259,7 @@ def select_param_linear_multiclass(
     for i in param_range:
         clf = OneVsRestClassifier(LinearSVC(penalty,loss,dual,C=i,random_state=445))
         perf = cv_performance_multiclass(clf,X,y,k,metric)
-        update_logs(log, 'For C = ' + str(param_val) + ' ' + metric + ' had performance = ' + str(perf) + '\n')
+        update_logs(log, 'For C = ' + str(i) + ' ' + metric + ' had performance = ' + str(perf) + '\n')
         if perf > max_performance:
             max_performance = perf
             max_c = i
@@ -305,11 +282,11 @@ Proper choice of C and gamma is critical to the SVMs performance.
 One is advised to use GridSearchCV with C and gamma spaced exponentially far apart to choose good values.
 """
 def select_param_rbf(X, y, k=4, metric="accuracy", param_range=[]):
-  def get_svc(curr_params):
-    C, gamma = curr_params
-    return create_rbf_classifier(c=C, gamma=gamma)
+  def get_svc(curr_params, X, y):
+    gamma = curr_params
+    return create_rbf_classifier(X=X, y=y, gamma=gamma)
   
-  return select_param_general(get_svc, X, y, k, metric, param_range, "(C, gamma)")
+  return select_param_general(get_svc, X, y, k, metric, param_range, "(gamma)")
 
 
 """
@@ -319,9 +296,9 @@ Uses a quadratic kernel SVM
 param range should include (C,r) pairs
 """
 def select_param_poly(X, y, degree=2, k=4, metric="accuracy", param_range=[]):
-  def get_svc(curr_params):
+  def get_svc(curr_params, X, y):
     C, r = curr_params
-    return create_poly_classifier(degree=degree, c=C, r=r)
+    return create_poly_classifier(X=X, y=y, degree=degree, c=C, r=r)
   
   return select_param_general(get_svc, X, y, k, metric, param_range, "(C, r)")
 
@@ -409,67 +386,67 @@ if __name__ == "__main__":
 
   # Only tests One-vs-Rest classification (this means for each hyperparam val, it'll train num_songs classifiers)
   # We won't use One-vs-One as that'd make it (num_songs)^2 classifiers to train PER HYPERPARAM VALUE which is yikes
-  print("linear 1 start")
-  now = datetime.datetime.now()
-  print(now)
-  with open("linearHyperParamL1.txt", "w") as file:
-    best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l1')
-    update_logs(log, "\n\tBEST VALUES FOR L1 LINEAR (C): " + str(best_param_vals) + "\n")
-    file.writelines(log)
+  # print("linear 1 start")
+  # now = datetime.datetime.now()
+  # print(now)
+  # with open("linearHyperParamL1.txt", "w") as file:
+  #   best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l1')
+  #   update_logs(log, "\n\tBEST VALUES FOR L1 LINEAR (C): " + str(best_param_vals) + "\n")
+  #   file.writelines(log)
 
-    clf = create_linear_classifier(penalty='l1', c=best_param_vals, degree=1, decision_function_shape='ovr')
-    clf.fit(xData,yTrue)
-    with open('modellinearHyperParamL1.pkl','wb') as f:
-      pickle.dump(clf,f)
-  print("linear 1 done")
+  #   clf = create_linear_classifier(penalty='l1', c=best_param_vals, degree=1, decision_function_shape='ovr')
+  #   clf.fit(xData,yTrue)
+  #   with open('modellinearHyperParamL1.pkl','wb') as f:
+  #     pickle.dump(clf,f)
+  # print("linear 1 done")
   
-  print("linear 2 start")
-  now = datetime.datetime.now()
-  print(now)
-  with open("linearHyperParamL2.txt", "w") as file:
-    best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
-    update_logs(log, "\n\tBEST VALUES FOR L1 LINEAR (C): " + str(best_param_vals) + "\n")
-    file.writelines(log)
+  # print("linear 2 start")
+  # now = datetime.datetime.now()
+  # print(now)
+  # with open("linearHyperParamL2.txt", "w") as file:
+  #   best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
+  #   update_logs(log, "\n\tBEST VALUES FOR L1 LINEAR (C): " + str(best_param_vals) + "\n")
+  #   file.writelines(log)
 
-    clf = create_linear_classifier(penalty='l2', c=best_param_vals, degree=1, decision_function_shape='ovr')
-    clf.fit(xData,yTrue)
-    with open('modellinearHyperParamL2.pkl','wb') as f:
-      pickle.dump(clf,f)
-  print("linear 2 done")
+  #   clf = create_linear_classifier(penalty='l2', c=best_param_vals, degree=1, decision_function_shape='ovr')
+  #   clf.fit(xData,yTrue)
+  #   with open('modellinearHyperParamL2.pkl','wb') as f:
+  #     pickle.dump(clf,f)
+  # print("linear 2 done")
 
-  print("quadratic start")
-  now = datetime.datetime.now()
-  print(now)
-  with open("quadraticHyperParamL2.txt", "w") as file:
-    best_param_vals, log = select_param_poly(X=xData, y=yTrue2D, param_range=hyperparam_grid_square, degree=2)
-    update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
-    file.writelines(log)
+  # print("quadratic start")
+  # now = datetime.datetime.now()
+  # print(now)
+  # with open("quadraticHyperParamL2.txt", "w") as file:
+  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue2D, param_range=hyperparam_grid_square, degree=2)
+  #   update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
+  #   file.writelines(log)
 
-    clf = create_poly_classifier(degree=2, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
-    clf.fit(xData,yTrue2D)
-    with open('modelquadraticL2.pkl','wb') as f:
-      pickle.dump(clf,f)
-  print("quadratic done")
+  #   clf = create_poly_classifier(degree=2, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
+  #   clf.fit(xData,yTrue2D)
+  #   with open('modelquadraticL2.pkl','wb') as f:
+  #     pickle.dump(clf,f)
+  # print("quadratic done")
 
-  print("cubic start")
-  now = datetime.datetime.now()
-  print(now)
-  with open("CubicHyperParamL2.txt", "w") as file:
-    best_param_vals, log = select_param_poly(X=xData, y=yTrue2D, param_range=hyperparam_grid_square, degree=3)
-    update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
-    file.writelines(log)
+  # print("cubic start")
+  # now = datetime.datetime.now()
+  # print(now)
+  # with open("CubicHyperParamL2.txt", "w") as file:
+  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=3)
+  #   update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
+  #   file.writelines(log)
 
-    clf = create_poly_classifier(degree=3, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
-    clf.fit(xData,yTrue2D)
-    with open('modelCubicL2.pkl','wb') as f:
-      pickle.dump(clf,f)
-  print("cubic done")
+  #   clf = create_poly_classifier(degree=3, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
+  #   clf.fit(xData,yTrue2D)
+  #   with open('modelCubicL2.pkl','wb') as f:
+  #     pickle.dump(clf,f)
+  # print("cubic done")
 
   print("rbf start")
   now = datetime.datetime.now()
   print(now)
   with open("RBFHyperParamL2.txt", "w") as file:
-    best_param_vals, log = select_param_rbf(X=xData, y=yTrue2D, param_range=hyperparam_grid_square)
+    best_param_vals, log = select_param_rbf(X=xData, y=yTrue, param_range=hyperparam_grid)
     update_logs(log, "\n\tBEST VALUES FOR RBF (C, gamma): " + str(best_param_vals) + "\n")
     file.writelines(log)
 
@@ -479,16 +456,32 @@ if __name__ == "__main__":
       pickle.dump(clf,f)
   print("rbf done")
 
-  print("linear multiclass start")
-  now = datetime.datetime.now()
-  print(now)
-  with open("linearHyperParamL1.txt", "w") as file:
-    best_param_vals, log = select_param_linear_multiclass(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
-    update_logs(log, "\n\tBEST VALUES FOR LINEAR Multiclass (C): " + str(best_param_vals) + "\n")
-    file.writelines(log)
+  # print("linear multiclass start")
+  # now = datetime.datetime.now()
+  # print(now)
+  # with open("linearHyperParamL1.txt", "w") as file:
+  #   best_param_vals, log = select_param_linear_multiclass(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
+  #   update_logs(log, "\n\tBEST VALUES FOR LINEAR Multiclass (C): " + str(best_param_vals) + "\n")
+  #   file.writelines(log)
 
-    clf = OneVsRestClassifier(LinearSVC(penalty,loss,dual,C=best_param_vals,random_state=445))
-    clf.fit(xData,yTrue)
-    with open('modellinearMulticlass.pkl','wb') as f:
-      pickle.dump(clf,f)
-  print("linear multiclass done")
+  #   clf = OneVsRestClassifier(LinearSVC(penalty,loss,dual,C=best_param_vals,random_state=445))
+  #   clf.fit(xData,yTrue)
+  #   with open('modellinearMulticlass.pkl','wb') as f:
+  #     pickle.dump(clf,f)
+  # print("linear multiclass done")
+
+
+  '''
+  arsh:
+  Quadratic
+
+  raef:
+  Cubic
+
+  sid:
+  Linear Multiclass
+
+  grant:
+  RBF 
+
+  '''
