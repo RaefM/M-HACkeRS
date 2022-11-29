@@ -1,0 +1,14 @@
+For (gamma) = 1 accuracy had performance = 0.05034028870676872
+For (gamma) = 0.1 accuracy had performance = 0.38621558625903096
+For (gamma) = 0.01 accuracy had performance = 0.3106328013115038
+For (gamma) = 0.001 accuracy had performance = 0.17829024028579926
+For (gamma) = 0.0001 accuracy had performance = 0.09199271299821599
+For (gamma) = 1e-05 accuracy had performance = 0.04392097839433232
+For (gamma) = 10 accuracy had performance = 0.005791748082730897
+For (gamma) = 100 accuracy had performance = 0.004440368774699726
+For (gamma) = 1000 accuracy had performance = 0.004440368774699726
+For (gamma) = 10000 accuracy had performance = 0.004440368774699726
+For (gamma) = 100000 accuracy had performance = 0.004440368774699726
+
+	BEST VALUES FOR RBF (C, gamma): 0.1
+): 0.1

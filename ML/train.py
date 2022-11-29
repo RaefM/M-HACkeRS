@@ -23,6 +23,7 @@ from sklearn_genetic.callbacks import ProgressBar
 from sklearn.kernel_approximation import RBFSampler
 from sklearn.linear_model import SGDClassifier
 from sklearn.kernel_approximation import PolynomialCountSketch
+from sklearn.kernel_approximation import Nystroem
 
 """
 DEPENDENCY SETUP INSTRUCTIONS
@@ -87,10 +88,14 @@ def create_poly_classifier(X, y, degree=2, c=1.0, r=0.0, n_components=100):
   return SGDClassifier(max_iter=1000, tol=1e-3), X_new
 
 
-def create_rbf_classifier(X, y, gamma=0.0, n_components=100):
+def create_rbf_classifier(X, y, gamma=0.0, n_components=300):
   rbf_feature = RBFSampler(gamma=gamma, random_state=1, n_components=n_components)
   X_new = rbf_feature.fit_transform(X, y)
   return SGDClassifier(max_iter=1000, tol=1e-3), X_new
+  # feature_map_nystroem = Nystroem(gamma=gamma, random_state=1, n_components=n_components)
+  # data_transformed = feature_map_nystroem.fit_transform(X=X, y=y)
+  # return LinearSVC(dual=False), data_transformed
+
 
 def performance(y_true, Y_pred, metric="accuracy"):
     """Calculate performance metrics.
@@ -414,49 +419,51 @@ if __name__ == "__main__":
   #     pickle.dump(clf,f)
   # print("linear 2 done")
 
-  print("quadratic start")
+  # print("quadratic start")
+  # now = datetime.datetime.now()
+  # print(now)
+  # with open("quadraticHyperParamL2.txt", "w") as file:
+  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=2)
+  #   update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
+  #   file.writelines(log)
+
+  #   C, r = best_param_vals
+
+  #   clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=2, c=C, r=r)
+  #   clf.fit(xNew,yTrue)
+  #   with open('modelquadraticL2.pkl','wb') as f:
+  #     pickle.dump(clf,f)
+  # print("quadratic done")
+
+  print("cubic start")
   now = datetime.datetime.now()
   print(now)
-  with open("quadraticHyperParamL2.txt", "w") as file:
-    best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=2)
-    update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
+  with open("CubicHyperParamL2.txt", "w") as file:
+    best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=3)
+    update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
     file.writelines(log)
 
     C, r = best_param_vals
 
-    clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=2, c=C, r=r)
+    clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=3, c=C, r=r)
     clf.fit(xNew,yTrue)
-    with open('modelquadraticL2.pkl','wb') as f:
+    with open('modelCubicL2.pkl','wb') as f:
       pickle.dump(clf,f)
-  print("quadratic done")
+  print("cubic done")
 
-  # print("cubic start")
+  # print("rbf start")
   # now = datetime.datetime.now()
   # print(now)
-  # with open("CubicHyperParamL2.txt", "w") as file:
-  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=3)
-  #   update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
+  # with open("RBFHyperParamL2.txt", "w") as file:
+  #   best_param_vals, log = select_param_rbf(X=xData, y=yTrue, param_range=hyperparam_grid)
+  #   update_logs(log, "\n\tBEST VALUES FOR RBF (C, gamma): " + str(best_param_vals) + "\n")
   #   file.writelines(log)
 
-  #   clf = create_poly_classifier(degree=3, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
-  #   clf.fit(xData,yTrue2D)
-  #   with open('modelCubicL2.pkl','wb') as f:
+  #   clf, xNew = create_rbf_classifier(X=xData, y=yTrue, gamma=best_param_vals)
+  #   clf.fit(xNew,yTrue)
+  #   with open('modelRbfL2.pkl','wb') as f:
   #     pickle.dump(clf,f)
-  # print("cubic done")
-
-  print("rbf start")
-  now = datetime.datetime.now()
-  print(now)
-  with open("RBFHyperParamL2.txt", "w") as file:
-    best_param_vals, log = select_param_rbf(X=xData, y=yTrue, param_range=hyperparam_grid)
-    update_logs(log, "\n\tBEST VALUES FOR RBF (C, gamma): " + str(best_param_vals) + "\n")
-    file.writelines(log)
-
-    clf = create_rbf_classifier(c=best_param_vals, decision_function_shape='ovr', gamma=best_param_vals)
-    clf.fit(xData,yTrue)
-    with open('modelRbfL2.pkl','wb') as f:
-      pickle.dump(clf,f)
-  print("rbf done")
+  # print("rbf done")
 
   # print("linear multiclass start")
   # now = datetime.datetime.now()
