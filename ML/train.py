@@ -424,8 +424,8 @@ if __name__ == "__main__":
 
     C, r = best_param_vals
 
-    clf = create_poly_classifier(degree=2, c=C, r=r, decision_function_shape='ovr')
-    clf.fit(xData,yTrue)
+    clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=2, c=C, r=r)
+    clf.fit(xNew,yTrue)
     with open('modelquadraticL2.pkl','wb') as f:
       pickle.dump(clf,f)
   print("quadratic done")
