@@ -81,14 +81,14 @@ def create_linear_classifier(penalty='l2', c=1.0, degree=1, decision_function_sh
     return LinearSVC(dual = False, C = c,class_weight = 'balanced')
 
 
-def create_poly_classifier(X, y, degree=2, c=1.0, r=0.0):
-  ps = PolynomialCountSketch(degree=degree, random_state=1, gamma=c, coef0=r)
+def create_poly_classifier(X, y, degree=2, c=1.0, r=0.0, n_components=100):
+  ps = PolynomialCountSketch(degree=degree, random_state=1, gamma=c, coef0=r, n_components=n_components)
   X_new = ps.fit_transform(X, y)
   return SGDClassifier(max_iter=1000, tol=1e-3), X_new
 
 
-def create_rbf_classifier(X, y, gamma=0.0):
-  rbf_feature = RBFSampler(gamma=gamma, random_state=1)
+def create_rbf_classifier(X, y, gamma=0.0, n_components=100):
+  rbf_feature = RBFSampler(gamma=gamma, random_state=1, n_components=n_components)
   X_new = rbf_feature.fit_transform(X, y)
   return SGDClassifier(max_iter=1000, tol=1e-3), X_new
 
@@ -414,19 +414,19 @@ if __name__ == "__main__":
   #     pickle.dump(clf,f)
   # print("linear 2 done")
 
-  # print("quadratic start")
-  # now = datetime.datetime.now()
-  # print(now)
-  # with open("quadraticHyperParamL2.txt", "w") as file:
-  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue2D, param_range=hyperparam_grid_square, degree=2)
-  #   update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
-  #   file.writelines(log)
+  print("quadratic start")
+  now = datetime.datetime.now()
+  print(now)
+  with open("quadraticHyperParamL2.txt", "w") as file:
+    best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=2)
+    update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
+    file.writelines(log)
 
-  #   clf = create_poly_classifier(degree=2, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
-  #   clf.fit(xData,yTrue2D)
-  #   with open('modelquadraticL2.pkl','wb') as f:
-  #     pickle.dump(clf,f)
-  # print("quadratic done")
+    clf = create_poly_classifier(degree=2, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
+    clf.fit(xData,yTrue2D)
+    with open('modelquadraticL2.pkl','wb') as f:
+      pickle.dump(clf,f)
+  print("quadratic done")
 
   # print("cubic start")
   # now = datetime.datetime.now()
