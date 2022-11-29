@@ -422,7 +422,9 @@ if __name__ == "__main__":
     update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
     file.writelines(log)
 
-    clf = create_poly_classifier(degree=2, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
+    C, r = best_param_vals
+
+    clf = create_poly_classifier(degree=2, c=C, r=r, decision_function_shape='ovr')
     clf.fit(xData,yTrue)
     with open('modelquadraticL2.pkl','wb') as f:
       pickle.dump(clf,f)
