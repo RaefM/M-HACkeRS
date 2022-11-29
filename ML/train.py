@@ -423,7 +423,7 @@ if __name__ == "__main__":
     file.writelines(log)
 
     clf = create_poly_classifier(degree=2, c=best_param_vals, r=best_param_vals, decision_function_shape='ovr')
-    clf.fit(xData,yTrue2D)
+    clf.fit(xData,yTrue)
     with open('modelquadraticL2.pkl','wb') as f:
       pickle.dump(clf,f)
   print("quadratic done")
@@ -451,7 +451,7 @@ if __name__ == "__main__":
     file.writelines(log)
 
     clf = create_rbf_classifier(c=best_param_vals, decision_function_shape='ovr', gamma=best_param_vals)
-    clf.fit(xData,yTrue2D)
+    clf.fit(xData,yTrue)
     with open('modelRbfL2.pkl','wb') as f:
       pickle.dump(clf,f)
   print("rbf done")
