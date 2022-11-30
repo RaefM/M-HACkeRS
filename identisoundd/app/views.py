@@ -25,10 +25,13 @@ def openJSON(fname):
     f = open(fname)
     return json.load(f)
 
-def extract_training_data():
+def relativePathToAbsolute(path):
     module_dir = os.path.dirname(__file__)  # get current directory
-    file_path = os.path.join(module_dir, "normalizedPitchVectors.json")
-    labeledJson = openJSON(file_path)
+    return os.path.join(module_dir, path)
+
+
+def extract_training_data():
+    labeledJson = openJSON(relativePathToAbsolute("normalizedPitchVectors.json"))
 
     xTrain = []
     yTrue = []
@@ -83,7 +86,7 @@ def normalize_vector(pitchVector):
 
 
 def predict(normalizedPitchVector):
-    pickled_model = pickle.load(open('modelRbfL2.pkl', 'rb'))
+    pickled_model = pickle.load(open(relativePathToAbsolute('modelRbfL2.pkl'), 'rb'))
     return pickled_model.predict(normalizedPitchVector)
 
 
