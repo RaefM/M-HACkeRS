@@ -143,7 +143,7 @@ class AudioPlayer() {
         if (songName == null) {
             // if failed to identify, restart recording
             Log.d("finishRecording", "song was null")
-            getMovie(context, Song("If I Didn't Care"), navController)
+            //getMovie(context, Song("If I Didn't Care"), navController)
             //recTapped(context,navController)
         } else {
             getMovie(context, Song(songName), navController)

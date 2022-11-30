@@ -44,17 +44,17 @@ object SongStore {
 
         val songName: String? =
             when (val match = session.match(signature)) {
-                is MatchResult.Match -> {
+                 is MatchResult.Match -> {
                     Log.d("shazam success", match.matchedMediaItems.toString())
                     match.matchedMediaItems[0].title
                 }
                 is MatchResult.Error -> {
                     Log.d("shazam error", match.exception.toString())
-                    null
+                    "No Song Found"
                 }
                 is MatchResult.NoMatch -> {
                     Log.d("shazam none", match.querySignature.toString())
-                    null
+                    "No Song Found"
                 }
             }
 

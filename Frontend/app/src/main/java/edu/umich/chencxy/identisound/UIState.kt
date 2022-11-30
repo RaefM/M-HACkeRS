@@ -31,6 +31,16 @@ class UIState {
         recIcon = R.drawable.ic_baseline_play_circle_24
     }
 
+    fun set_loading(){
+        recIcon = R.drawable.ic_baseline_change_circle_24
+
+    }
+
+    fun reLoad(){
+        recIcon = R.drawable.ic_baseline_play_circle_24
+    }
+
+
     fun propagate(playerState: PlayerState) = when (playerState){
         is PlayerState.start -> {
             when (playerState.mode) {
