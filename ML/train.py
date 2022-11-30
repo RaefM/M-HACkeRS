@@ -77,9 +77,9 @@ def extract_training_data():
 
 def create_linear_classifier(penalty='l2', c=1.0, degree=1, decision_function_shape='ovr'):
   if (penalty == 'l1'):
-    return LinearSVC(penalty = 'l1', dual = False, C = c,class_weight = 'balanced')
+    return LinearSVC(penalty = 'l1', dual = False, C = c,class_weight = 'balanced', max_iter=2000)
   else:
-    return LinearSVC(dual = False, C = c,class_weight = 'balanced')
+    return LinearSVC(dual = False, C = c,class_weight = 'balanced', max_iter=2000)
 
 
 def create_poly_classifier(X, y, degree=2, c=1.0, r=0.0, n_components=100):
@@ -89,12 +89,12 @@ def create_poly_classifier(X, y, degree=2, c=1.0, r=0.0, n_components=100):
 
 
 def create_rbf_classifier(X, y, gamma=0.0, n_components=300):
-  rbf_feature = RBFSampler(gamma=gamma, random_state=1, n_components=n_components)
-  X_new = rbf_feature.fit_transform(X, y)
-  return SGDClassifier(max_iter=1000, tol=1e-3), X_new
-  # feature_map_nystroem = Nystroem(gamma=gamma, random_state=1, n_components=n_components)
-  # data_transformed = feature_map_nystroem.fit_transform(X=X, y=y)
-  # return LinearSVC(dual=False), data_transformed
+  # rbf_feature = RBFSampler(gamma=gamma, random_state=1, n_components=n_components)
+  # X_new = rbf_feature.fit_transform(X, y)
+  # return SGDClassifier(max_iter=1000, tol=1e-3), X_new
+  feature_map_nystroem = Nystroem(gamma=gamma, random_state=1, n_components=n_components)
+  data_transformed = feature_map_nystroem.fit_transform(X=X, y=y)
+  return LinearSVC(dual=False), data_transformed
 
 
 def performance(y_true, Y_pred, metric="accuracy"):
@@ -384,40 +384,40 @@ if __name__ == "__main__":
   scaler = StandardScaler()
   xData = scaler.fit_transform(X=xData, y=yTrue)
 
-  hyperparam_grid = get_exp_grid(6)
+  hyperparam_grid = get_exp_grid(3)
   hyperparam_grid_square = get_exp_grid_square(4)
 
   # scikit_docs_pipeline(xData, yTrue)
 
   # Only tests One-vs-Rest classification (this means for each hyperparam val, it'll train num_songs classifiers)
   # We won't use One-vs-One as that'd make it (num_songs)^2 classifiers to train PER HYPERPARAM VALUE which is yikes
-  # print("linear 1 start")
-  # now = datetime.datetime.now()
-  # print(now)
-  # with open("linearHyperParamL1.txt", "w") as file:
-  #   best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l1')
-  #   update_logs(log, "\n\tBEST VALUES FOR L1 LINEAR (C): " + str(best_param_vals) + "\n")
-  #   file.writelines(log)
+  print("linear 1 start")
+  now = datetime.datetime.now()
+  print(now)
+  with open("linearHyperParamL1.txt", "w") as file:
+    best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l1')
+    update_logs(log, "\n\tBEST VALUES FOR L1 LINEAR (C): " + str(best_param_vals) + "\n")
+    file.writelines(log)
 
-  #   clf = create_linear_classifier(penalty='l1', c=best_param_vals, degree=1, decision_function_shape='ovr')
-  #   clf.fit(xData,yTrue)
-  #   with open('modellinearHyperParamL1.pkl','wb') as f:
-  #     pickle.dump(clf,f)
-  # print("linear 1 done")
+    clf = create_linear_classifier(penalty='l1', c=best_param_vals, degree=1, decision_function_shape='ovr')
+    clf.fit(xData,yTrue)
+    with open('modellinearHyperParamL1.pkl','wb') as f:
+      pickle.dump(clf,f)
+  print("linear 1 done")
   
-  # print("linear 2 start")
-  # now = datetime.datetime.now()
-  # print(now)
-  # with open("linearHyperParamL2.txt", "w") as file:
-  #   best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
-  #   update_logs(log, "\n\tBEST VALUES FOR L1 LINEAR (C): " + str(best_param_vals) + "\n")
-  #   file.writelines(log)
+  print("linear 2 start")
+  now = datetime.datetime.now()
+  print(now)
+  with open("linearHyperParamL2.txt", "w") as file:
+    best_param_vals, log = select_param_linear(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
+    update_logs(log, "\n\tBEST VALUES FOR L2 LINEAR (C): " + str(best_param_vals) + "\n")
+    file.writelines(log)
 
-  #   clf = create_linear_classifier(penalty='l2', c=best_param_vals, degree=1, decision_function_shape='ovr')
-  #   clf.fit(xData,yTrue)
-  #   with open('modellinearHyperParamL2.pkl','wb') as f:
-  #     pickle.dump(clf,f)
-  # print("linear 2 done")
+    clf = create_linear_classifier(penalty='l2', c=best_param_vals, degree=1, decision_function_shape='ovr')
+    clf.fit(xData,yTrue)
+    with open('modellinearHyperParamL2.pkl','wb') as f:
+      pickle.dump(clf,f)
+  print("linear 2 done")
 
   # print("quadratic start")
   # now = datetime.datetime.now()
@@ -435,21 +435,21 @@ if __name__ == "__main__":
   #     pickle.dump(clf,f)
   # print("quadratic done")
 
-  print("cubic start")
-  now = datetime.datetime.now()
-  print(now)
-  with open("CubicHyperParamL2.txt", "w") as file:
-    best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=3)
-    update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
-    file.writelines(log)
+  # print("cubic start")
+  # now = datetime.datetime.now()
+  # print(now)
+  # with open("CubicHyperParamL2.txt", "w") as file:
+  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=3)
+  #   update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
+  #   file.writelines(log)
 
-    C, r = best_param_vals
+  #   C, r = best_param_vals
 
-    clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=3, c=C, r=r)
-    clf.fit(xNew,yTrue)
-    with open('modelCubicL2.pkl','wb') as f:
-      pickle.dump(clf,f)
-  print("cubic done")
+  #   clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=3, c=C, r=r)
+  #   clf.fit(xNew,yTrue)
+  #   with open('modelCubicL2.pkl','wb') as f:
+  #     pickle.dump(clf,f)
+  # print("cubic done")
 
   # print("rbf start")
   # now = datetime.datetime.now()

@@ -3,11 +3,18 @@ from django.http import JsonResponse, HttpResponse
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
+from sklearn.preprocessing import StandardScaler
+from sklearn.kernel_approximation import Nystroem
+import soundfile as sf
+import pickle
+import numpy as np
 import json
 import string
 import uuid
 import pathlib
 import base64
+import librosa
+import wave
 
 from django.core.files.storage import FileSystemStorage
 from io import StringIO
@@ -15,6 +22,68 @@ from io import StringIO
 def cleanse_data(text):
     """Cleanse data by removing puncation and lowercase."""
     return text.translate(str.maketrans('','',string.punctuation)).lower()
+
+def openJSON(fname):
+    f = open(fname)
+    return json.load(f)
+
+def extract_training_data():
+    labeledJson = openJSON("normalizedPitchVectors.json")
+
+    xTrain = []
+    yTrue = []
+
+    for songName in labeledJson:
+        for pitchVector in labeledJson[songName]:
+            xTrain.append(pitchVector)
+            yTrue.append(songName)
+
+    return np.array(xTrain), np.array(yTrue)
+
+
+def audio_file_to_pitch_vector(audioFileName):
+    # pcm to wav
+    with open(audioFileName, 'rb') as pcmfile:
+        pcmdata = pcmfile.read()
+
+    with wave.open(audioFileName+'.wav', 'wb') as wavfile:
+        wavfile.setparams((2, 2, 44100, 0, 'NONE', 'NONE'))
+        wavfile.writeframes(pcmdata)
+    
+    # load wav into time series
+    time_series = librosa.load(audioFileName+'.wav', sr=48000)
+
+    # delete files
+    fs = FileSystemStorage()
+    fs.delete(audioFileName)
+    fs.delete(audioFileName+'.wav')
+
+    # convert time series to 12 chroma vector of pitch
+    chroma =  librosa.feature.chroma_stft(y=time_series, sr=48000)
+    return np.average(a=chroma, axis=1)
+
+def normalize_vector(pitchVector):
+    # Read in the data to instatiate the normalizer and the Nystroem random RBF feature mapping 
+    # using the predetermined seed and hyperparameter values
+    X, y = extract_training_data()
+
+    # Normalize it
+    scaler = StandardScaler()
+    scaler.fit(X=X, y=y)
+
+    normalizedPitchVector = scaler.transform(pitchVector)
+
+    # Convert it using the RBFSampler projection stuff
+    feature_map_nystroem = Nystroem(gamma=0.1, random_state=1, n_components=100)
+    feature_map_nystroem.fit(X=X, y=y)
+
+    return feature_map_nystroem.transform(normalizedPitchVector)
+
+
+def predict(normalizedPitchVector):
+    pickled_model = pickle.load(open('modelRbfL2.pkl', 'rb'))
+    return pickled_model.predict(normalizedPitchVector)
+
 
 def getmovies(request):
     if request.method != 'GET':
@@ -27,6 +96,7 @@ def getmovies(request):
     response = {}
     response['songs'] = rows
     return JsonResponse(response)
+
 
 @csrf_exempt
 def getsongs(request):
@@ -42,7 +112,6 @@ def getsongs(request):
 
     cursor.execute('SELECT s.id FROM songs s WHERE s.name =(%s);', (songName,))
     queryResp = cursor.fetchall()
-    
 
     if(len(queryResp) == 0):
         return JsonResponse({"error":"song with name not found"})
@@ -78,7 +147,10 @@ def postAudio(request):
     content = StringIO(decodedStringContent)
 
     fs = FileSystemStorage()
-    filename = fs.save(fileName, content)
-    fileurl = fs.url(filename)
+    serverFilename = fs.save(fileName, content)
+    
+    pitchVector = audio_file_to_pitch_vector(serverFilename)
+    normalizedPitchVector = normalize_vector(pitchVector)
+    prediction = predict(normalizedPitchVector)[0]
 
-    return JsonResponse({"status":"200", "fileurl":fileurl})
+    return JsonResponse({"status":"200", "songName":prediction})
