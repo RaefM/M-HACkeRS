@@ -71,7 +71,9 @@ def normalize_vector(pitchVector):
     scaler = StandardScaler()
     scaler.fit(X=X, y=y)
 
-    normalizedPitchVector = scaler.transform(pitchVector)
+    twoDimPitchVec = np.array([list(pitchVector)])
+
+    normalizedPitchVector = scaler.transform(twoDimPitchVec)
 
     # Convert it using the RBFSampler projection stuff
     feature_map_nystroem = Nystroem(gamma=0.1, random_state=1, n_components=100)
