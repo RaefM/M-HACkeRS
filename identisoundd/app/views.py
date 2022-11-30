@@ -12,6 +12,7 @@ import pathlib
 import base64
 import librosa
 import wave
+import os
 
 from django.core.files.storage import FileSystemStorage
 from io import StringIO
@@ -25,7 +26,9 @@ def openJSON(fname):
     return json.load(f)
 
 def extract_training_data():
-    labeledJson = openJSON("normalizedPitchVectors.json")
+    module_dir = os.path.dirname(__file__)  # get current directory
+    file_path = os.path.join(module_dir, "normalizedPitchVectors.json")
+    labeledJson = openJSON(file_path)
 
     xTrain = []
     yTrue = []
