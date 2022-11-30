@@ -1,11 +1,8 @@
-from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage
 from sklearn.preprocessing import StandardScaler
 from sklearn.kernel_approximation import Nystroem
-import soundfile as sf
 import pickle
 import numpy as np
 import json
