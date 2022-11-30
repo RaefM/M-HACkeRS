@@ -48,7 +48,7 @@ def audio_file_to_pitch_vector(audioFileName):
         wavfile.writeframes(pcmdata)
     
     # load wav into time series
-    time_series = librosa.load(audioFileName+'.wav', sr=48000)
+    time_series, sr = librosa.load(audioFileName+'.wav', sr=48000)
 
     # delete files
     fs = FileSystemStorage()
@@ -56,7 +56,7 @@ def audio_file_to_pitch_vector(audioFileName):
     fs.delete(audioFileName+'.wav')
 
     # convert time series to 12 chroma vector of pitch
-    chroma =  librosa.feature.chroma_stft(y=time_series, sr=48000)
+    chroma =  librosa.feature.chroma_stft(y=time_series, sr=sr)
     return np.average(a=chroma, axis=1)
 
 def normalize_vector(pitchVector):
