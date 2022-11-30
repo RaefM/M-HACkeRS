@@ -26,6 +26,7 @@ import edu.umich.chencxy.identisound.SongStore.getSongTitle
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -36,6 +37,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 val LocalPlayerUIState = compositionLocalOf { UIState() }
@@ -67,6 +71,7 @@ fun MainView(context: Context, navController: NavHostController) {
             )
             RecButton(context, navController)
             Log.d("abc", "we are here")
+
         }
     }
 }
@@ -75,8 +80,13 @@ fun MainView(context: Context, navController: NavHostController) {
 fun RecButton(context: Context, navController: NavHostController) {
     val audioPlayer = LocalAudioPlayer.current
     val playerUIState = LocalPlayerUIState.current
-
-    Button(onClick = { runBlocking { audioPlayer.recTapped(context,navController) }},
+    playerUIState.reLoad()
+    Button(onClick = {
+        playerUIState.set_loading()
+        GlobalScope.async { audioPlayer.recTapped(context,navController) }
+        //Thread.sleep(11000)
+        //playerUIState.set_loading()
+        },
         enabled = playerUIState.recEnabled,
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
             disabledBackgroundColor = Color.White),
