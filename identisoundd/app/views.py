@@ -13,6 +13,7 @@ import base64
 import librosa
 import wave
 import os
+import uuid
 
 from django.core.files.storage import FileSystemStorage
 from io import StringIO
@@ -148,7 +149,7 @@ def postAudio(request):
 
     json_data = json.loads(request.body)
 
-    fileName = "./static/audiofiles/"+json_data["fileName"]
+    fileName = "./static/audiofiles/"+str(uuid.uuid4())
     logFileName = "./static/logs/systemlog.txt"
 
     b64content = json_data['file']
