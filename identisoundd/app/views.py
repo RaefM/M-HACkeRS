@@ -162,7 +162,7 @@ def postAudio(request):
         log.write("NEW REQUEST: " + str(request) + '\n')
         pitchVector = audio_file_to_pitch_vector(serverFilename)
         log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
-        normalizedPitchVector = normalize_vector(pitchVector)
+        normalizedPitchVector = normalize_vector(pitchVector, log)
         log.write("\tNORMALIZED NYSTROEM RBF PITCH VECTOR: " + str(normalizedPitchVector) + '\n')
         prediction = predict(normalizedPitchVector)[0]
         log.write("\PREDICTION: " + str(prediction) + '\n')
