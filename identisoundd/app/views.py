@@ -158,9 +158,11 @@ def postAudio(request):
     fileName = "./static/audiofiles/"+str(uuid.uuid4())
     logFileName = "./static/logs/systemlog.txt"
 
-    b64content = json_data['file']
-    decodedStringContent = base64.b64decode(b64content).decode('utf-8')
-    content = StringIO(decodedStringContent)
+    # b64content = json_data['file']
+    # decodedStringContent = base64.b64decode(b64content).decode('utf-8')
+    # content = StringIO(decodedStringContent)
+
+    content = StringIO(json_data['file'])
 
     fs = FileSystemStorage()
     serverFilename = fs.save(fileName, content)
@@ -168,8 +170,8 @@ def postAudio(request):
     with open(logFileName, 'a+') as log:
         now = datetime.datetime.now()
         log.write("@NEW REQUEST " + str(now) + ": " + str(request) + '\n')
-        log.write("\tRECEIVED B64 CONTENT: " + str(b64content) + '\n')
-        log.write("\tDECODED CONTENT: " + str(decodedStringContent) + '\n')
+        log.write("\tRECEIVED CONTENT: " + str(content) + '\n')
+        # log.write("\tDECODED CONTENT: " + str(decodedStringContent) + '\n')
         pitchVector = audio_file_to_pitch_vector(serverFilename)
         log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
         normalizedPitchVector = normalize_vector(pitchVector, log)
