@@ -156,7 +156,7 @@ def postAudio(request):
     fs = FileSystemStorage()
     serverFilename = fs.save(fileName, content)
 
-    with open(logFileName, 'a') as log:
+    with open(logFileName, 'a+') as log:
         log.write("NEW REQUEST: " + str(request) + '\n')
         pitchVector = audio_file_to_pitch_vector(serverFilename)
         log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
