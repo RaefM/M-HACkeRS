@@ -14,6 +14,8 @@ import librosa
 import wave
 import os
 import uuid
+import datetime
+
 
 from django.core.files.storage import FileSystemStorage
 from io import StringIO
@@ -163,7 +165,10 @@ def postAudio(request):
     serverFilename = fs.save(fileName, content)
 
     with open(logFileName, 'a+') as log:
-        log.write("NEW REQUEST: " + str(request) + '\n')
+        now = datetime.datetime.now()
+        log.write("@NEW REQUEST " + str(now) + ": " + str(request) + '\n')
+        log.write("\tRECEIVED B64 CONTENT: " + str(b64content) + '\n')
+        log.write("\tDECODED CONTENT: " + str(decodedStringContent) + '\n')
         pitchVector = audio_file_to_pitch_vector(serverFilename)
         log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
         normalizedPitchVector = normalize_vector(pitchVector, log)
