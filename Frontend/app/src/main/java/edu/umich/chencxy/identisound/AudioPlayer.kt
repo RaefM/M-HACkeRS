@@ -91,7 +91,22 @@ class AudioPlayer() {
         finishRecording(context, navController, recordedBytes)
     }
 
+
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
      private fun startRecording(): ByteArray {
+         val audioSource = MediaRecorder.AudioSource.UNPROCESSED
+
+         audioFormat = AudioFormat.Builder()
+             .setChannelMask(AudioFormat.CHANNEL_IN_MONO)
+             .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+             .setSampleRate(48_000)
+             .build()
+
+         audioRecorder = AudioRecord.Builder()
+             .setAudioSource(audioSource)
+             .setAudioFormat(audioFormat)
+             .build()
+
         // reset player because we'll be re-using the output file that may have been primed at the player.
         mediaPlayer.reset()
 
@@ -109,7 +124,8 @@ class AudioPlayer() {
              AudioFormat.CHANNEL_IN_MONO,
              AudioFormat.ENCODING_PCM_16BIT
          )
-
+         Log.d("recordingState",audioRecorder.recordingState.toString())
+         Log.d("recorDERstate",audioRecorder.state.toString())
          audioRecorder.startRecording()
          val readBuffer = ByteArray(bufferSize)
          while (destination.remaining()>0) {
