@@ -68,7 +68,7 @@ object SongStore {
             Log.d("ML", "getSongTitleML with null audio")
             return
         }
-
+        Log.d("byteArraySum",audio.sum().toString())
         val b64AudioString = String(Base64.getEncoder().encode(audio))
         val fileName = "testAudio.pcm"
 

@@ -88,6 +88,7 @@ class AudioPlayer() {
 
     suspend fun recTapped(context: Context, navController: NavHostController) { // attempting
         val recordedBytes = startRecording()
+        Log.d("recordedBytes",recordedBytes.sum().toString())
         finishRecording(context, navController, recordedBytes)
     }
 
