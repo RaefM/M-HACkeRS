@@ -50,7 +50,8 @@ def audio_file_to_pitch_vector(audioFileName):
         pcmdata = pcmfile.read()
 
     with wave.open(audioFileName+'.wav', 'wb') as wavfile:
-        wavfile.setparams((2, 2, 44100, 0, 'NONE', 'NONE'))
+        # mono audio with a 48000 Hz sampling rate
+        wavfile.setparams((1, 2, 48000, 0, 'NONE', 'NONE'))
         wavfile.writeframes(pcmdata)
     
     # load wav into time series
@@ -146,6 +147,7 @@ def postAudio(request):
     json_data = json.loads(request.body)
 
     fileName = "./static/audiofiles/"+json_data["fileName"]
+    logFileName = "./static/logs/systemlog.txt"
 
     b64content = json_data['file']
     decodedStringContent = base64.b64decode(b64content).decode('utf-8')
@@ -153,9 +155,19 @@ def postAudio(request):
 
     fs = FileSystemStorage()
     serverFilename = fs.save(fileName, content)
+
+    with open(logFileName, 'a') as log:
+        log.write("NEW REQUEST: " + str(request) + '\n')
+        pitchVector = audio_file_to_pitch_vector(serverFilename)
+        log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
+        normalizedPitchVector = normalize_vector(pitchVector)
+        log.write("\tNORMALIZED PITCH VECTOR: " + str(normalizedPitchVector) + '\n')
+        prediction = predict(normalizedPitchVector)[0]
+        log.write("\PREDICTION: " + str(prediction) + '\n')
+        log.write('\n\n')
     
-    pitchVector = audio_file_to_pitch_vector(serverFilename)
-    normalizedPitchVector = normalize_vector(pitchVector)
-    prediction = predict(normalizedPitchVector)[0]
+    # pitchVector = audio_file_to_pitch_vector(serverFilename)
+    # normalizedPitchVector = normalize_vector(pitchVector)
+    # prediction = predict(normalizedPitchVector)[0]
 
     return JsonResponse({"status":"200", "songName":prediction})
