@@ -76,7 +76,7 @@ def normalize_vector(pitchVector, logFile):
 
     # Normalize it
     scaler = StandardScaler()
-    scaler.fit(X=X, y=y)
+    X_scaled = scaler.fit_transform(X=X, y=y)
 
     twoDimPitchVec = np.array([list(pitchVector)])
 
@@ -88,8 +88,9 @@ def normalize_vector(pitchVector, logFile):
     feature_map_nystroem = Nystroem(gamma=0.1, random_state=1, n_components=100)
     X_new = feature_map_nystroem.fit_transform(X=X, y=y)
 
-    logFile.write("\tSAMPLE POINT 1 FROM TRAIN SET: " + str(X_new[0]) + '\n')
-    logFile.write("\tSAMPLE POINT 2 FROM TRAIN SET: " + str(X_new[1]) + '\n')
+    logFile.write("\tSAMPLE POINT FROM UNNORMALIZED TRAIN SET: " + str(X[0]) + '\n')
+    logFile.write("\tSAMPLE POINT FROM NORMALIZED TRAIN SET: " + str(X_scaled[0]) + '\n')
+    logFile.write("\tSAMPLE POINT FROM NYSTROEM TRAIN SET: " + str(X_new[0]) + '\n')
 
     return feature_map_nystroem.transform(normalizedPitchVector)
 
