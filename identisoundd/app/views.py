@@ -84,7 +84,10 @@ def normalize_vector(pitchVector, logFile):
 
     # Convert it using the RBFSampler projection stuff
     feature_map_nystroem = Nystroem(gamma=0.1, random_state=1, n_components=100)
-    feature_map_nystroem.fit(X=X, y=y)
+    X_new = feature_map_nystroem.fit_transform(X=X, y=y)
+
+    logFile.write("\tSAMPLE POINT 1 FROM TRAIN SET: " + str(X_new[0]) + '\n')
+    logFile.write("\tSAMPLE POINT 2 FROM TRAIN SET: " + str(X_new[1]) + '\n')
 
     return feature_map_nystroem.transform(normalizedPitchVector)
 
