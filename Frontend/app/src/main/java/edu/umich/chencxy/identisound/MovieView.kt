@@ -19,9 +19,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import edu.umich.chencxy.identisound.SongStore.movies
 import edu.umich.chencxy.identisound.SongStore.songs
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 /*
     TO DO:
@@ -39,6 +42,25 @@ fun MovieView(context: Context, navController: NavHostController) {
     Scaffold(
         // put the topBar here
     ) {
+        Button(onClick = {
+            navController.navigate("MainView")
+        },
+            enabled = true,
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White,
+                disabledBackgroundColor = Color.White),
+            elevation = ButtonDefaults.elevation(0.dp),
+            modifier = Modifier.zIndex(3f)
+
+        ) {
+            Icon(painter = painterResource(R.drawable.ic_baseline_keyboard_backspace_24),
+                modifier= Modifier.size(30.dp),
+                contentDescription = stringResource(R.string.recButton),
+                tint = Color.Black
+            )
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+
+
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(it.calculateStartPadding(LayoutDirection.Ltr)+8.dp,

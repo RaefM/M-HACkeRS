@@ -25,19 +25,25 @@ class UIState {
     var recEnabled by mutableStateOf(true)
     var recIcon by mutableStateOf(R.drawable.ic_baseline_play_circle_24) // initial value
     var stopIcon by mutableStateOf(R.drawable.ic_baseline_stop_circle_24) // initial value
-
+    var mainviewtext by mutableStateOf("Tap to Record Song")
     private fun reset(){
-        recEnabled = false
+        recEnabled = true
         recIcon = R.drawable.ic_baseline_play_circle_24
     }
 
     fun set_loading(){
         recIcon = R.drawable.ic_baseline_change_circle_24
+        mainviewtext = "Loading"
 
+    }
+
+    fun set_recording(){
+        mainviewtext = "Recording"
     }
 
     fun reLoad(){
         recIcon = R.drawable.ic_baseline_play_circle_24
+        mainviewtext = "Tap to Record Song"
     }
 
 

@@ -117,6 +117,7 @@ class AudioPlayer() {
              val byteArray = readBuffer.sliceArray(0 until actualRead)
              destination.putTrimming(byteArray)
          }
+         audioRecorder.stop()
          audioRecorder.release()
          return destination.array()
     }
@@ -138,17 +139,17 @@ class AudioPlayer() {
 
     private suspend fun finishRecording(context: Context, navController: NavHostController, audio: ByteArray) {
         Log.d("pika-pika","called finish recording")
-        val songName = getSongTitle(context, audio)
+        val songName = getSongTitle(context, audio, navController)
 
-        if (songName == null) {
-            // if failed to identify, restart recording
-            Log.d("finishRecording", "song was null")
-            //getMovie(context, Song("If I Didn't Care"), navController)
-            //recTapped(context,navController)
-        } else {
-            getMovie(context, Song(songName), navController)
-
-        }
+//        if (songName == null) {
+//            // if failed to identify, restart recording
+//            Log.d("finishRecording", "song was null")
+//            //getMovie(context, Song("If I Didn't Care"), navController)
+//            //recTapped(context,navController)
+//        } else {
+//            getMovie(context, Song(songName), navController)
+//
+//        }
 
         playerState = playerState.transition(TransEvent.recTapped)
 

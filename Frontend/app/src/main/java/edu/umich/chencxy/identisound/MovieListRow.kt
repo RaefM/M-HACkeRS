@@ -54,7 +54,7 @@ fun MovieListRow(index: Int, movie: Movie) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(90.dp))
 
 
 

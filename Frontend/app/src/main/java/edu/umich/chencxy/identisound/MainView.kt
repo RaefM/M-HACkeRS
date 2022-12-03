@@ -64,8 +64,8 @@ fun MainView(context: Context, navController: NavHostController) {
 
         ) {
             Text(
-                "Press To Crash the phone🥰🥰",
-                fontSize = 22.sp,
+                "Tap to Record Song",
+                fontSize = 25.sp,
                 textAlign = TextAlign.End,
                 modifier = Modifier.padding(4.dp, 8.dp, 4.dp, 0.dp)
             )

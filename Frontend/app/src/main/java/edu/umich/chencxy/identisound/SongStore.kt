@@ -13,6 +13,7 @@ import com.shazam.shazamkit.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.*
 import kotlin.reflect.full.declaredMemberProperties
 
 object SongStore {
@@ -24,41 +25,78 @@ object SongStore {
     private lateinit var queue: RequestQueue
     private const val serverUrl = "https://54.226.221.81/"
 
-    suspend fun getSongTitle(context: Context, audio: ByteArray?): String? {
-        //DEBUG = true turns off Shazam function... For testing front end quickly.
-        //val DEBUG = false
-        //if (DEBUG){return "Singin' in the Rain"} //If I Didn't Care
-        val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
+//    suspend fun getSongTitle(context: Context, audio: ByteArray?): String? {
+//        //DEBUG = true turns off Shazam function... For testing front end quickly.
+//        val DEBUG = true
+//        if (DEBUG){return "Singin' in the Rain"} //If I Didn't Care
+//        val signatureGenerator = (ShazamKit.createSignatureGenerator(AudioSampleRateInHz.SAMPLE_RATE_48000) as ShazamKitResult.Success).data
+//
+//        audio?.let {
+//            signatureGenerator.append(
+//                it,
+//                audio.size,
+//                System.currentTimeMillis()
+//            )
+//        }
+//        val signature = signatureGenerator.generateSignature()
+//
+//        val catalog = ShazamKit.createShazamCatalog(DevTokenProvider(context), null)
+//        val session = (ShazamKit.createSession(catalog) as ShazamKitResult.Success).data
+//
+//        val songName: String? =
+//            when (val match = session.match(signature)) {
+//                 is MatchResult.Match -> {
+//                    Log.d("shazam success", match.matchedMediaItems.toString())
+//                    match.matchedMediaItems[0].title
+//                }
+//                is MatchResult.Error -> {
+//                    Log.d("shazam error", match.exception.toString())
+//                    "No Song Found"
+//                }
+//                is MatchResult.NoMatch -> {
+//                    Log.d("shazam none", match.querySignature.toString())
+//                    "No Song Found"
+//                }
+//            }
+//
+//        return songName
+//    }
 
-        audio?.let {
-            signatureGenerator.append(
-                it,
-                audio.size,
-                System.currentTimeMillis()
-            )
+    fun getSongTitle(context: Context, audio: ByteArray?, navController: NavHostController) {
+        Log.d("ML", "getSongTitleML called")
+        if (audio == null) {
+            Log.d("ML", "getSongTitleML with null audio")
+            return
         }
-        val signature = signatureGenerator.generateSignature()
 
-        val catalog = ShazamKit.createShazamCatalog(DevTokenProvider(context), null)
-        val session = (ShazamKit.createSession(catalog) as ShazamKitResult.Success).data
+        val b64AudioString = String(Base64.getEncoder().encode(audio))
+        val fileName = "testAudio.pcm"
 
-        val songName: String? =
-            when (val match = session.match(signature)) {
-                 is MatchResult.Match -> {
-                    Log.d("shazam success", match.matchedMediaItems.toString())
-                    match.matchedMediaItems[0].title
-                }
-                is MatchResult.Error -> {
-                    Log.d("shazam error", match.exception.toString())
-                    "No Song Found"
-                }
-                is MatchResult.NoMatch -> {
-                    Log.d("shazam none", match.querySignature.toString())
-                    "No Song Found"
-                }
-            }
+        val jsonObj = mapOf(
+            "fileName" to fileName,
+            "file" to b64AudioString,
+        )
 
-        return songName
+        Log.d("ML", jsonObj.toString())
+        Log.d("ML sending", b64AudioString)
+
+        val postRequest = JsonObjectRequest(Request.Method.POST,
+            serverUrl+"postAudio/", JSONObject(jsonObj),
+            {
+                    response ->
+                Log.d("ML postAudio response", response.toString())
+                val songName = try {response.getString("songName")
+                } catch (e: JSONException) { null }
+
+                getMovie(context, Song(songName), navController)
+            },
+            { error -> Log.e("ML Audio", error.localizedMessage ?: "JsonObjectRequest error") }
+        )
+
+        if (!this::queue.isInitialized) {
+            queue = newRequestQueue(context)
+        }
+        queue.add(postRequest)
     }
 
     fun getMovie(context: Context, song: Song, navController: NavHostController){
