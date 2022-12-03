@@ -66,7 +66,7 @@ def audio_file_to_pitch_vector(audioFileName):
     chroma =  librosa.feature.chroma_stft(y=time_series, sr=sr)
     return np.average(a=chroma, axis=1)
 
-def normalize_vector(pitchVector):
+def normalize_vector(pitchVector, logFile):
     # Read in the data to instatiate the normalizer and the Nystroem random RBF feature mapping 
     # using the predetermined seed and hyperparameter values
     X, y = extract_training_data()
@@ -78,6 +78,8 @@ def normalize_vector(pitchVector):
     twoDimPitchVec = np.array([list(pitchVector)])
 
     normalizedPitchVector = scaler.transform(twoDimPitchVec)
+
+    logFile.write("\tNORMALIZED LINEAR PITCH VECTOR: " + str(normalizedPitchVector) + '\n')
 
     # Convert it using the RBFSampler projection stuff
     feature_map_nystroem = Nystroem(gamma=0.1, random_state=1, n_components=100)
@@ -161,7 +163,7 @@ def postAudio(request):
         pitchVector = audio_file_to_pitch_vector(serverFilename)
         log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
         normalizedPitchVector = normalize_vector(pitchVector)
-        log.write("\tNORMALIZED PITCH VECTOR: " + str(normalizedPitchVector) + '\n')
+        log.write("\tNORMALIZED NYSTROEM RBF PITCH VECTOR: " + str(normalizedPitchVector) + '\n')
         prediction = predict(normalizedPitchVector)[0]
         log.write("\PREDICTION: " + str(prediction) + '\n')
         log.write('\n\n')
