@@ -51,7 +51,7 @@ def audio_file_to_pitch_vector(audioFileName, log):
     # pcm to wav
     with open(audioFileName, 'rb') as pcmfile:
         pcmdata = pcmfile.read()
-        log.write("\tRECEIVED PCM CONTENT: " + str(pcmdata) + '\n')
+        log.write("\tSAMPLE OF RECEIVED PCM CONTENT: " + str(pcmdata)[0:100] + '\n')
 
     with wave.open(audioFileName+'.wav', 'wb') as wavfile:
         # mono audio with a 48000 Hz sampling rate
