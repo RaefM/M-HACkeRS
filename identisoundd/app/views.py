@@ -47,10 +47,11 @@ def extract_training_data():
     return np.array(xTrain), np.array(yTrue)
 
 
-def audio_file_to_pitch_vector(audioFileName):
+def audio_file_to_pitch_vector(audioFileName, log):
     # pcm to wav
     with open(audioFileName, 'rb') as pcmfile:
         pcmdata = pcmfile.read()
+        log.write("\tSAMPLE OF RECEIVED PCM CONTENT: " + str(pcmdata)[0:100] + '\n')
 
     with wave.open(audioFileName+'.wav', 'wb') as wavfile:
         # mono audio with a 48000 Hz sampling rate
@@ -153,32 +154,36 @@ def postAudio(request):
     if request.method != 'POST':
         return HttpResponse(status=404)
 
-    json_data = json.loads(request.body)
+    # json_data = json.loads(request.body)
 
-    fileName = "./static/audiofiles/"+str(uuid.uuid4())
+    # fileName = "./static/audiofiles/"+str(uuid.uuid4())
     logFileName = "./static/logs/systemlog.txt"
 
-    b64content = json_data['file']
-    decodedStringContent = base64.b64decode(b64content).decode('utf-8')
-    content = StringIO(decodedStringContent)
+    # b64content = json_data['file']
+    # decodedStringContent = base64.b64decode(b64content).decode('utf-8')
+    # content = StringIO(decodedStringContent)
 
-    content = StringIO(decodedStringContent)
+    # content = StringIO(decodedStringContent)
 
-    fs = FileSystemStorage()
-    serverFilename = fs.save(fileName, content)
+    # fs = FileSystemStorage()
+    # serverFilename = fs.save(fileName, content)
 
-    with open(logFileName, 'a+') as log:
-        now = datetime.datetime.now()
-        log.write("@NEW REQUEST " + str(now) + ": " + str(request) + '\n')
-        log.write("\tRECEIVED B64 CONTENT: " + str(b64content) + '\n')
-        log.write("\tDECODED CONTENT: " + str(decodedStringContent) + '\n')
-        pitchVector = audio_file_to_pitch_vector(serverFilename)
-        log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
-        normalizedPitchVector = normalize_vector(pitchVector, log)
-        log.write("\tNORMALIZED NYSTROEM RBF PITCH VECTOR: " + str(normalizedPitchVector) + '\n')
-        prediction = predict(normalizedPitchVector)[0]
-        log.write("\PREDICTION: " + str(prediction) + '\n')
-        log.write('\n\n')
+    if request.FILES.get("audio"):
+        content = request.FILES['audio']
+        filename = 'audio'+str(datetime.datetime.now())+".pcm"
+        fs = FileSystemStorage()
+        serverFileName = fs.save(filename, content)
+
+        with open(logFileName, 'a+') as log:
+            now = datetime.datetime.now()
+            log.write("@NEW REQUEST " + str(now) + ": " + str(request) + '\n')
+            pitchVector = audio_file_to_pitch_vector(serverFileName, log)
+            log.write("\tGENERATED UNNORMALIZED CHROMA VECTOR OF PITCHES: " + str(pitchVector) + '\n')
+            normalizedPitchVector = normalize_vector(pitchVector, log)
+            log.write("\tNORMALIZED NYSTROEM RBF PITCH VECTOR: " + str(normalizedPitchVector) + '\n')
+            prediction = predict(normalizedPitchVector)[0]
+            log.write("\PREDICTION: " + str(prediction) + '\n')
+            log.write('\n\n')
     
     # pitchVector = audio_file_to_pitch_vector(serverFilename)
     # normalizedPitchVector = normalize_vector(pitchVector)
