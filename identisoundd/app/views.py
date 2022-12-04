@@ -170,7 +170,7 @@ def postAudio(request):
 
     if request.FILES.get("audio"):
         content = request.FILES['audio']
-        filename = 'audio'+str(datetime.now())+".pcm"
+        filename = 'audio'+str(datetime.datetime.now())+".pcm"
         fs = FileSystemStorage()
         serverFileName = fs.save(filename, content)
 
