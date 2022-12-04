@@ -1,7 +1,8 @@
 package edu.umich.chencxy.identisound
 
 import android.content.Context
-import android.os.Build
+import android.os.Environment
+import android.os.Environment.getExternalStorageDirectory
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
@@ -10,17 +11,26 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley.newRequestQueue
 import com.shazam.shazamkit.*
+import edu.umich.chencxy.identisound.ui.theme.toast
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
+import java.io.IOException
 import java.util.*
-import kotlin.reflect.full.declaredMemberProperties
+import okhttp3.Request as okhttpRequest
+
 
 object SongStore {
     private val _songs = mutableStateListOf<Song>()
     private val _movies = mutableStateListOf<Movie>()
     val songs: List<Song> = _songs
     val movies: List<Movie> = _movies
+    private val client = OkHttpClient()
 
     private lateinit var queue: RequestQueue
     private const val serverUrl = "https://54.226.221.81/"
@@ -69,34 +79,45 @@ object SongStore {
             return
         }
         Log.d("byteArraySum",audio.sum().toString())
-        val b64AudioString = String(Base64.getEncoder().encode(audio))
-        val fileName = "testAudio.pcm"
 
-        val jsonObj = mapOf(
-            "fileName" to fileName,
-            "file" to b64AudioString,
-        )
+        postAudio(context, audio, navController)
+    }
 
-        Log.d("ML", jsonObj.toString())
-        Log.d("ML sending", b64AudioString)
+    private fun postAudio(context: Context, audioBytes: ByteArray, navController: NavHostController) {
+        val mpFD = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("filename", "test.pcm")
 
-        val postRequest = JsonObjectRequest(Request.Method.POST,
-            serverUrl+"postAudio/", JSONObject(jsonObj),
-            {
-                    response ->
+        val f = File(context.cacheDir, "test.txt")
+        f.createNewFile()
+        f.appendBytes(audioBytes)
+
+        mpFD.addFormDataPart("audio", "temp.pcm",
+            f.asRequestBody("text/plain".toMediaType()))
+
+        val request = okhttpRequest.Builder()
+            .url(serverUrl+"postAudio/")
+            .post(mpFD.build())
+            .build()
+
+        try {
+            val response = client.newCall(request).execute()
+
+            if (response.isSuccessful) {
                 Log.d("ML postAudio response", response.toString())
-                val songName = try {response.getString("songName")
-                } catch (e: JSONException) { null }
+
+                val songName: String? = try {
+                    JSONObject(response.body?.string() ?: "").getString("songName")
+                } catch (e: JSONException) { "No Song Returned" }
 
                 getMovie(context, Song(songName), navController)
-            },
-            { error -> Log.e("ML Audio", error.localizedMessage ?: "JsonObjectRequest error") }
-        )
-
-        if (!this::queue.isInitialized) {
-            queue = newRequestQueue(context)
+            } else {
+                Log.d("ML postAudio failed", response.toString())
+            }
+        } catch (e: IOException) {
+            Log.d("postAudio", e.localizedMessage ?: "Posting failed")
         }
-        queue.add(postRequest)
+
+        f.delete()
     }
 
     fun getMovie(context: Context, song: Song, navController: NavHostController){

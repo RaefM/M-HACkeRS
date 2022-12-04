@@ -34,13 +34,16 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerForActivityResult(ActivityResultContracts.RequestPermission())
-        { granted ->
-            if (!granted) {
-                toast("Audio access denied")
-                finish()
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
+            results.forEach {
+                if (!it.value) {
+                    toast("${it.key} access denied")
+                    finish()
+                }
             }
-        }.launch(Manifest.permission.RECORD_AUDIO)
+        }.launch(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE))
         viewModel.audioPlayer?.let { audioPlayer ->
             setContent {
                 CompositionLocalProvider(LocalAudioPlayer provides audioPlayer) {
