@@ -419,78 +419,62 @@ if __name__ == "__main__":
       pickle.dump(clf,f)
   print("linear 2 done")
 
-  # print("quadratic start")
-  # now = datetime.datetime.now()
-  # print(now)
-  # with open("quadraticHyperParamL2.txt", "w") as file:
-  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=2)
-  #   update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
-  #   file.writelines(log)
+  print("quadratic start")
+  now = datetime.datetime.now()
+  print(now)
+  with open("quadraticHyperParamL2.txt", "w") as file:
+    best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=2)
+    update_logs(log, "\n\tBEST VALUES FOR QUADRATIC (C, r): " + str(best_param_vals) + "\n")
+    file.writelines(log)
 
-  #   C, r = best_param_vals
+    C, r = best_param_vals
 
-  #   clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=2, c=C, r=r)
-  #   clf.fit(xNew,yTrue)
-  #   with open('modelquadraticL2.pkl','wb') as f:
-  #     pickle.dump(clf,f)
-  # print("quadratic done")
+    clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=2, c=C, r=r)
+    clf.fit(xNew,yTrue)
+    with open('modelquadraticL2.pkl','wb') as f:
+      pickle.dump(clf,f)
+  print("quadratic done")
 
-  # print("cubic start")
-  # now = datetime.datetime.now()
-  # print(now)
-  # with open("CubicHyperParamL2.txt", "w") as file:
-  #   best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=3)
-  #   update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
-  #   file.writelines(log)
+  print("cubic start")
+  now = datetime.datetime.now()
+  print(now)
+  with open("CubicHyperParamL2.txt", "w") as file:
+    best_param_vals, log = select_param_poly(X=xData, y=yTrue, param_range=hyperparam_grid_square, degree=3)
+    update_logs(log, "\n\tBEST VALUES FOR CUBIC (C, r): " + str(best_param_vals) + "\n")
+    file.writelines(log)
 
-  #   C, r = best_param_vals
+    C, r = best_param_vals
 
-  #   clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=3, c=C, r=r)
-  #   clf.fit(xNew,yTrue)
-  #   with open('modelCubicL2.pkl','wb') as f:
-  #     pickle.dump(clf,f)
-  # print("cubic done")
+    clf, xNew = create_poly_classifier(X=xData, y=yTrue, degree=3, c=C, r=r)
+    clf.fit(xNew,yTrue)
+    with open('modelCubicL2.pkl','wb') as f:
+      pickle.dump(clf,f)
+  print("cubic done")
 
-  # print("rbf start")
-  # now = datetime.datetime.now()
-  # print(now)
-  # with open("RBFHyperParamL2.txt", "w") as file:
-  #   best_param_vals, log = select_param_rbf(X=xData, y=yTrue, param_range=hyperparam_grid)
-  #   update_logs(log, "\n\tBEST VALUES FOR RBF (C, gamma): " + str(best_param_vals) + "\n")
-  #   file.writelines(log)
+  print("rbf start")
+  now = datetime.datetime.now()
+  print(now)
+  with open("RBFHyperParamL2.txt", "w") as file:
+    best_param_vals, log = select_param_rbf(X=xData, y=yTrue, param_range=hyperparam_grid)
+    update_logs(log, "\n\tBEST VALUES FOR RBF (C, gamma): " + str(best_param_vals) + "\n")
+    file.writelines(log)
 
-  #   clf, xNew = create_rbf_classifier(X=xData, y=yTrue, gamma=best_param_vals)
-  #   clf.fit(xNew,yTrue)
-  #   with open('modelRbfL2.pkl','wb') as f:
-  #     pickle.dump(clf,f)
-  # print("rbf done")
+    clf, xNew = create_rbf_classifier(X=xData, y=yTrue, gamma=best_param_vals)
+    clf.fit(xNew,yTrue)
+    with open('modelRbfL2.pkl','wb') as f:
+      pickle.dump(clf,f)
+  print("rbf done")
 
-  # print("linear multiclass start")
-  # now = datetime.datetime.now()
-  # print(now)
-  # with open("linearHyperParamL1.txt", "w") as file:
-  #   best_param_vals, log = select_param_linear_multiclass(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
-  #   update_logs(log, "\n\tBEST VALUES FOR LINEAR Multiclass (C): " + str(best_param_vals) + "\n")
-  #   file.writelines(log)
+  print("linear multiclass start")
+  now = datetime.datetime.now()
+  print(now)
+  with open("linearHyperParamL1.txt", "w") as file:
+    best_param_vals, log = select_param_linear_multiclass(X=xData, y=yTrue, param_range=hyperparam_grid, penalty='l2')
+    update_logs(log, "\n\tBEST VALUES FOR LINEAR Multiclass (C): " + str(best_param_vals) + "\n")
+    file.writelines(log)
 
-  #   clf = OneVsRestClassifier(LinearSVC(penalty,loss,dual,C=best_param_vals,random_state=445))
-  #   clf.fit(xData,yTrue)
-  #   with open('modellinearMulticlass.pkl','wb') as f:
-  #     pickle.dump(clf,f)
-  # print("linear multiclass done")
-
-
-  '''
-  arsh:
-  Quadratic
-
-  raef:
-  Cubic
-
-  sid:
-  Linear Multiclass
-
-  grant:
-  RBF 
-
-  '''
+    clf = OneVsRestClassifier(LinearSVC(penalty,loss,dual,C=best_param_vals,random_state=445))
+    clf.fit(xData,yTrue)
+    with open('modellinearMulticlass.pkl','wb') as f:
+      pickle.dump(clf,f)
+  print("linear multiclass done")
