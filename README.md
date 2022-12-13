@@ -1,4 +1,4 @@
-# UM EECS441§3&4 F22 M-HACkeRS
+# UM EECS441 F22 M-HACkeRS
 
 | Video  |  Wiki |  Trello  |
 |:-----:|:-----:|:--------:|
